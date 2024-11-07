@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
-from django.contrib.auth.models import AbstractUser
+from accounts.models import User
 
 
 class Tag(models.Model):
@@ -21,7 +21,7 @@ class Feed(models.Model):
     title = models.CharField(max_length=500, help_text='feed title')
     url = models.URLField(unique=True, help_text='rss url')
     description = models.TextField(null=True, help_text='feed description')
-    user = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='feeds', null=True, help_text='user associated with the feed')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='feeds', null=True, help_text='user associated with the feed')
     tags = models.ManyToManyField(Tag, related_name='feeds', help_text='tags associated with the feed')
     active = models.BooleanField(default=True, help_text='feed is still active or not')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -34,19 +34,6 @@ class Feed(models.Model):
         
     def str(self):
         return self.title
-
-
-class User(AbstractUser):
-    first_name = models.CharField(max_length=100, help_text='first name')
-    user_name = models.CharField(max_length=100, help_text='user name')
-    last_name = models.CharField(max_length=100, help_text='last name')
-    email = models.EmailField(unique=True, help_text='email address')    
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
 
 
 class Source(models.Model):
@@ -62,7 +49,7 @@ class Source(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=100, help_text='group name')
     sources = models.ManyToManyField(Source, related_name='group', help_text='sources associated with the group')
-    user = models.ForeignKey('User', on_delete=models.SET_NULL, related_name='group', null=True, help_text='user associated with the group')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='group', null=True, help_text='user associated with the group')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -88,7 +75,7 @@ class Report(models.Model):
 
 
 class UserQuery(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='user_queries', help_text='user associated with the query')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_queries', help_text='user associated with the query')
     question = models.TextField(help_text='query question')
     answer = models.TextField(help_text='query answer')
     date_range_start = models.DateField(verbose_name="Date Range Start")
@@ -102,7 +89,7 @@ class UserQuery(models.Model):
 
 class ConversationLog(models.Model):
     query = models.ForeignKey('UserQuery', on_delete=models.CASCADE, related_name='conversation_logs', help_text='query associated with the conversation log')
-    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='conversation_logs', help_text='user associated with the conversation log')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversation_logs', help_text='user associated with the conversation log')
     message = models.TextField(help_text='conversation message')
     created_at = models.DateTimeField(auto_now_add=True)
     

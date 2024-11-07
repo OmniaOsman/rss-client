@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'rss_client',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -134,8 +136,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # auth user model
-AUTH_USER_MODEL = 'rss_client.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # openai settings
 OPENAI_API_KEY = env('OPENAI_API_KEY')
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
