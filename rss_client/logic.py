@@ -85,28 +85,28 @@ def get_tags():
     return list(set(tags))
 
 
-def add_feed_to_user(data, request):
-    rss_url:str = data['rss_url']
-    user:User = request.user
+# def add_feed_to_user(data, request):
+#     rss_url:str = data['rss_url']
+#     user:User = request.user
     
-    # check rss url and get feed data using feedparser
-    try:
-        feed = feedparser.parse(rss_url)
-        title = feed['feed']['title']
-        url = feed.url
-        language_code = feed['feed']['language']
-    except Exception as e:
-        return {
-            'success': False,
-            'message': str(e)
-        }
+#     # check rss url and get feed data using feedparser
+#     try:
+#         feed = feedparser.parse(rss_url)
+#         title = feed['feed']['title']
+#         url = feed.url
+#         language_code = feed['feed']['language']
+#     except Exception as e:
+#         return {
+#             'success': False,
+#             'message': str(e)
+#         }
     
-    if user.feed and user.feed.url == rss_url:
-        return
+#     if user.feed and user.feed.url == rss_url:
+#         return
     
-    # add feed to user
-    user.feed.url = url
-    user.feed.title = title
-    user.feed.language_code = language_code
-    user.feed.save()
+#     # add feed to user
+#     user.feed.url = url
+#     user.feed.title = title
+#     user.feed.language_code = language_code
+#     user.feed.save()
     
