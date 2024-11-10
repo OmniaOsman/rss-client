@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from accounts.models import User
+from sources.models import Source
 
 
 class Tag(models.Model):
@@ -34,16 +35,6 @@ class Feed(models.Model):
         
     def str(self):
         return self.title
-
-
-class Source(models.Model):
-    name = models.CharField(max_length=100, help_text='source name')
-    rss_url = models.URLField(help_text='source url')
-    language_code = models.CharField(max_length=100, null=True, help_text='source language')
-    created_at = models.DateTimeField(auto_now_add=True) 
-
-    def __str__(self):
-        return self.name
     
 
 class Group(models.Model):
