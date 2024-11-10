@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
 from accounts.models import User
-from sources.models import Source
 
 
 class Tag(models.Model):
@@ -39,7 +38,6 @@ class Feed(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=100, help_text='group name')
-    sources = models.ManyToManyField(Source, related_name='group', help_text='sources associated with the group')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='group', null=True, help_text='user associated with the group')
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -7,9 +7,6 @@ def custom_exception_handler(exc, context):
     # Get the standard DRF exception response first
     response = exception_handler(exc, context)
 
-    if response is None:
-        response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     # Check if `exc.detail` has errors and format based on type
     if hasattr(exc, 'detail'):
         if isinstance(exc.detail, dict):

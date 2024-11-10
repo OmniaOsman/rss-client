@@ -1,7 +1,7 @@
 import feedparser
 import openai
 from django.conf import settings
-from .models import Source
+from sources.models import Source
 from rest_framework.validators import ValidationError
 
 
