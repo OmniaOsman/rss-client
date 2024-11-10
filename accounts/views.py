@@ -1,30 +1,31 @@
 from rest_framework.views import APIView
 from .serializers import *
 from .logic import register_user, login_user
-from rest_framework.response import Response
-from rest_framework import status
+from drf_spectacular.utils import extend_schema
+from rss_project.utils import process_request
 
 
 class RegisterView(APIView):
     permission_classes = []
     
+    @extend_schema(request=RegisterSerializer, responses=RegisterSerializerResponse)
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        response = register_user(serializer.data, request)
-        response = RegisterSerializerResponse(data=response)
-        response.is_valid(raise_exception=True)
-        return Response(response.validated_data, status=status.HTTP_201_CREATED)
-    
+        return process_request(
+            RegisterSerializer,
+            RegisterSerializerResponse,
+            register_user,
+            request
+        )
 
 class LoginView(APIView):
     permission_classes = []
     
+    @extend_schema(request=LoginSerializer, responses=LoginSerializerResponse)
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        response = login_user(serializer.data, request)
-        response = LoginSerializerResponse(data=response)
-        response.is_valid(raise_exception=True)
-        return Response(response.validated_data, status=status.HTTP_200_OK)
+        return process_request(
+            LoginSerializer,
+            LoginSerializerResponse,
+            login_user,
+            request
+        )
         

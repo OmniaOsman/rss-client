@@ -47,7 +47,7 @@ class SourcesAPI(ModelViewSet):
             request
         )
         
-        
+    @extend_schema(responses=SourceSerializerGetResponse)
     def patch(self, request, source_id):
         request_data = request.data.copy()
         
@@ -64,6 +64,10 @@ class SourcesAPI(ModelViewSet):
             request,
         )
     
+    @extend_schema(
+        parameters=[], 
+        responses={200: SourceSerializerDeleteResponse},
+    )
     def destroy(self, request, source_id):
         request.data['source_id'] = source_id
         return process_request(
