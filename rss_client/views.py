@@ -9,7 +9,7 @@ class NewsList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        response = get_news_from_multiple_sources()
+        response = get_news_from_multiple_sources(data={}, request=request)
         return rest_response.Response(response, status=status.HTTP_200_OK)
     
     
