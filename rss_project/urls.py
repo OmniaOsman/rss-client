@@ -23,6 +23,8 @@ urlpatterns = [
     path('api/v1/news/', include('rss_client.urls'), name='news'),
     path('api/v1/accounts/', include('accounts.urls'), name='accounts'),
     path('api/v1/sources/', include('sources.urls'), name='sources'),
+    path('api/v1/groups/', include('groups.urls'), name='groups'),
+    # API documentation
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/v1/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]

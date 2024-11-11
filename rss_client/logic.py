@@ -57,7 +57,7 @@ def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
                 external_id=entry['id'],
                 title=entry['title'],
                 url=entry['link'],
-                description=entry.get('title_detail', {}).get('value'),
+                description=entry.get('summary', ''),
                 active=True,
                 user_id=user_id
             )
@@ -90,7 +90,11 @@ def get_news_from_multiple_sources(data, request):
         news_entries = fetch_news_from_rss(url, limit, user_id)
         all_news[source] = news_entries
         
-    return all_news
+    return {
+        'success': True,
+        'message': 'News fetched successfully',
+        'payload':  all_news
+    }
     
 
 def get_tags():

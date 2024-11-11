@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rss_client',
     'accounts',
     'sources',
+    'groups',
 ]
 
 MIDDLEWARE = [

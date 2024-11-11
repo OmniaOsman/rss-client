@@ -64,15 +64,6 @@ class Feed(models.Model):
     def str(self):
         return self.title
     
-
-class Group(models.Model):
-    name = models.CharField(max_length=100, help_text='group name')
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='group', null=True, help_text='user associated with the group')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-    
     
 class ProcessedFeed(models.Model):
     feed = models.ForeignKey(Feed, on_delete=models.CASCADE, related_name='processed_feeds', help_text='feed associated with the processed feed')
