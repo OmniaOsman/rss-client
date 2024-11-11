@@ -29,7 +29,9 @@ class SourcesAPI(ModelViewSet):
     @extend_schema(responses=SourceSerializerGetResponse)
     def retrieve(self, request, source_id):
         # append the source id to request
-        request.data['source_id'] = source_id
+        request_data = request.data.copy()
+        request_data['source_id'] = source_id
+        request._full_data = request_data
         
         return process_request(
             SourceSerializerGetRequest,
@@ -69,7 +71,10 @@ class SourcesAPI(ModelViewSet):
         responses={200: SourceSerializerDeleteResponse},
     )
     def destroy(self, request, source_id):
-        request.data['source_id'] = source_id
+        request_data = request.data.copy()
+        request_data['source_id'] = source_id
+        request._full_data = request_data
+        
         return process_request(
             SourceSerializerDeleteRequest,
             SourceSerializerDeleteResponse,

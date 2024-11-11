@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import User
-from rss_client.models import Group
+from groups.models import Group
 
 
 class Source(models.Model):

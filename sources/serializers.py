@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from rss_client.models import Group
+from groups.models import Group
 from rss_project.utils import ResponseSerializer
 from .models import Source
 
 
 class SourceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     user_id = serializers.IntegerField(required=False, allow_null=True)
     group_id = serializers.IntegerField(required=False, allow_null=True)
@@ -26,15 +27,18 @@ class SourceSerializerGetRequest(serializers.Serializer):
     
     
 class SourceSerializerGetResponse(ResponseSerializer):
-    payload = SourceSerializer(many=False)
-    
-    def to_representation(self, instance):
-        if isinstance(instance, list):
-            self.fields['payload'] = SourceSerializer(instance, many=True)
+    def __init__(self, *args, **kwargs):
+        # Call the parent constructor
+        super().__init__(*args, **kwargs)
+        
+        # Access the data from the serializer context
+        data = kwargs.get('data', {})
+
+        # Conditionally set the `many` argument based on the input
+        if isinstance(data.get('payload'), list):
+            self.fields['payload'] = SourceSerializer(many=True, required=False)
         else:
-            self.fields['payload'] = SourceSerializer()
-            
-        return super().to_representation(instance)
+            self.fields['payload'] = SourceSerializer(many=False, required=False)
 
 
 # ---------------------------------- POST Serializer ----------------------------------

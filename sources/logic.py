@@ -9,7 +9,7 @@ def get_sources(data, request):
     """
     user_id: int = request.user.id
     sources = list(Source.objects.filter(user_id=user_id).values())
-
+    print(sources)
     return {
         'success': True,
         'message': 'Sources fetched successfully',
