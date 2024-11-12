@@ -33,3 +33,13 @@ def process_request(input_serializer_class, output_serializer_class, action_func
         
     return Response(output_serializer.data, status=status.HTTP_200_OK)
 
+
+def process_query_params(query_params):
+    data = {}
+    for key, value in query_params.items():
+        if key.endswith("[]"):
+            data[key[:-2]] = query_params.getlist(key)
+        else:
+            data[key] = value
+    return data
+    
