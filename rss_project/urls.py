@@ -16,14 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from chat.routing import websocket_urlpatterns
+
 
 urlpatterns = [
     path('api/v1/accounts/', include('accounts.urls'), name='accounts'),
     path('api/v1/sources/', include('sources.urls'), name='sources'),
     path('api/v1/groups/', include('groups.urls'), name='groups'),
     path('api/v1/feeds/', include('feeds.urls'), name='feeds'),
+    path('api/v1/chat/', include('chat.urls'), name='chat'),
     path('api/v1/news/', include('rss_client.urls'), name='news'),
+    # path('', include(websocket_urlpatterns)),
     path('admin/', admin.site.urls),
     # API documentation
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),

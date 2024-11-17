@@ -5,6 +5,7 @@ from sources.models import Source
 from .models import Feed, Tag
 from rest_framework.validators import ValidationError
 from datetime import datetime, timedelta
+from .tasks import summarize_feeds
 
 
 tags = []
@@ -35,6 +36,22 @@ def generate_tags_for_feed(title: str, summary: str):
     keywords = response.choices[0].message['content'].strip().split(", ")
     return keywords
 
+
+def generate_summary(titles: list, descriptions: list, urls: list):
+    messages = [
+        {"role": "system", "content": "أنت مساعد مفيد يلخص الأخبار."},
+        {"role": "user", "content": "اكتب تقريرًا مرجعيًا يحتوي على عنوان واحد وملخص واحد لجميع العناوين الإخبارية المقدمة أدناه، وقم بتنسيق التقرير ليكون بدون اي / و في شكل tuple:"},
+        {"role": "user", "content": "('العنوان', 'الملخص')"},
+        {"role": "user", "content": f"العناوين: {titles}، الملخصات: {descriptions}، روابط الأخبار: {urls}"},
+    ]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=messages
+    )
+    
+    return response.choices[0].message['content'].strip()
+    
     
 def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
     feed = feedparser.parse(rss_url)
@@ -123,3 +140,33 @@ def get_tags():
         list: Unique list of tags
     """
     return list(set(tags))
+
+
+def summarize_feeds_by_day(data, request):
+    user_id: int = request.user.id
+    day_date = datetime.strptime(request.GET.get('day_date'), "%Y-%m-%d").date() 
+
+    feeds = Feed.objects.filter(
+        user_id=user_id,
+        created_at__date=day_date
+    )
+    
+    if not feeds.exists():
+        raise ValidationError('No feeds found for this day')
+    
+    titles: list = list(feeds.values_list('title', flat=True))[:3]
+    descriptions: list = list(feeds.values_list('description', flat=True))[:3]
+    urls: list = list(feeds.values_list('url', flat=True))[:3]
+    
+    print("Calling Celery task with titles, descriptions, and urls...")
+    print("titles", titles)
+    print("descriptions", descriptions)
+    print("urls", urls)
+    # Run BG task that summarizes the feeds
+    summarize_feeds.delay(titles, descriptions, urls)  
+    
+    return {
+        'success': True,
+        'message': 'Feeds fetched successfully',
+        # 'payload':  result
+    }

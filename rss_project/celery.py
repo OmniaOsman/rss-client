@@ -17,6 +17,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
+app.autodiscover_tasks(['rss_client'])
 
 # Using Redis as the result backend.
 app.conf.broker_url = settings.CELERY_BROKER_URL
@@ -24,14 +25,15 @@ app.conf.result_backend = settings.CELERY_BROKER_URL
 app.conf.update(
     beat_log_level="DEBUG"
 )
-app.conf.beat_schedule = {
-    'fetch-news-every-minute': {
-        'task': 'fetch_news_from_rss',
-        'schedule': crontab(minute='*'),  # every minute
-        'args': () 
-    },
-}
+# app.conf.beat_schedule = {
+#     'fetch-news-every-minute': {
+#         'task': 'fetch_news_from_rss',
+#         'schedule': crontab(minute='*'),  # every minute
+#         'args': () 
+#     },
+# }
 
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+    
