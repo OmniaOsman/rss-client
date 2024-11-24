@@ -25,13 +25,19 @@ app.conf.result_backend = settings.CELERY_BROKER_URL
 app.conf.update(
     beat_log_level="DEBUG"
 )
-# app.conf.beat_schedule = {
-#     'fetch-news-every-minute': {
-#         'task': 'fetch_news_from_rss',
-#         'schedule': crontab(minute='*'),  # every minute
-#         'args': () 
-#     },
-# }
+from celery.schedules import crontab
+
+app.conf.beat_schedule = {
+    # Executes every minute
+    'add-every-monday-morning': {
+        'task': 'rss_client.tasks.send_newsletter',
+        'schedule': crontab(minute='*/1'),
+        'args': (),
+    },
+}
+app.conf.enable_utc = False
+app.conf.timezone = 'Africa/Cairo'
+
 
 @app.task(bind=True)
 def debug_task(self):

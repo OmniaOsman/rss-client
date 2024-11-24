@@ -66,7 +66,6 @@ class Feed(models.Model):
     
     
 class ProcessedFeed(models.Model):
-    feed = models.ForeignKey(Feed, on_delete=models.CASCADE, related_name='processed_feeds', help_text='feed associated with the processed feed')
     title = models.CharField(max_length=500, help_text='processed feed title')
     summary = models.TextField(help_text='processed feed summary')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -83,3 +82,14 @@ class Report(models.Model):
     def __str__(self):
         return str(self.created_at)
 
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    unsubscribed_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.email
+    

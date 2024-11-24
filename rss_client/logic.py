@@ -2,7 +2,7 @@ import feedparser
 import openai
 from django.conf import settings
 from sources.models import Source
-from .models import Feed, Tag
+from .models import Feed, Subscriber, Tag, ProcessedFeed
 from rest_framework.validators import ValidationError
 from datetime import datetime, timedelta
 from .tasks import summarize_feeds
@@ -144,7 +144,7 @@ def get_tags():
 
 def summarize_feeds_by_day(data, request):
     user_id: int = request.user.id
-    day_date = datetime.strptime(request.GET.get('day_date'), "%Y-%m-%d").date() 
+    day_date = datetime.strptime(request.GET.get('day_date', datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d").date() 
 
     feeds = Feed.objects.filter(
         user_id=user_id,
@@ -157,16 +157,55 @@ def summarize_feeds_by_day(data, request):
     titles: list = list(feeds.values_list('title', flat=True))[:3]
     descriptions: list = list(feeds.values_list('description', flat=True))[:3]
     urls: list = list(feeds.values_list('url', flat=True))[:3]
+
+    processed_feed = ProcessedFeed.objects.filter(
+        created_at__date=day_date
+    )
     
-    print("Calling Celery task with titles, descriptions, and urls...")
-    print("titles", titles)
-    print("descriptions", descriptions)
-    print("urls", urls)
+    if processed_feed.exists():
+        return {
+            'success': True,
+            'message': 'Feeds fetched successfully',
+            'payload':  (processed_feed.values())
+        }
+    
     # Run BG task that summarizes the feeds
-    summarize_feeds.delay(titles, descriptions, urls)  
+    processed_feed = summarize_feeds.delay(titles, descriptions, urls)  
     
     return {
         'success': True,
         'message': 'Feeds fetched successfully',
-        # 'payload':  result
+        'payload':  processed_feed
+    }
+
+
+
+def subscribe_to_newsletter(data, request):
+    """Subscribe to newsletter"""
+    email = data.get('email')
+
+    # check if subscriber already exists
+    if Subscriber.objects.filter(email=email).exists():
+        # update is_active to true
+        Subscriber.objects.filter(email=email).update(is_active=True, subscribed_at=datetime.now())
+    else:
+        # extract name from email
+        name = email.split('@')[0]
+        
+        Subscriber.objects.create(email=email, name=name, is_active=True, subscribed_at=datetime.now())
+    
+    return {
+        'success': True,
+        'message': 'subscribed successfully',
+    }
+
+
+def unsubscribe_from_newsletter(data, request):
+    """Unsubscribe from newsletter"""
+    email = data.get('email')
+    Subscriber.objects.filter(email=email).update(is_active=False, unsubscribed_at=datetime.now())
+    
+    return {
+        'success': True,
+        'message': 'unsubscribed successfully',
     }
