@@ -37,5 +37,5 @@ class User(AbstractUser):
     objects = CustomUserManager()
     REQUIRED_FIELDS = []
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name}, ID: {self.id}'
     

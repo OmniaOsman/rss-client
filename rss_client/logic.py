@@ -1,11 +1,14 @@
+from django.db import IntegrityError
 import feedparser
 import openai
 from django.conf import settings
 from sources.models import Source
-from .models import Feed, Subscriber, Tag, ProcessedFeed
+from .models import Feed, Subscriber, Tag, ProcessedFeed, TagCategory
 from rest_framework.validators import ValidationError
-from datetime import datetime, timedelta
+from datetime import datetime
 from .tasks import summarize_feeds
+import json
+from django.db.models import Q
 
 
 tags = []
@@ -26,14 +29,30 @@ def generate_tags_for_feed(title: str, summary: str):
     messages = [
         {"role": "system", "content": "You are a helpful assistant that generates keywords."},
         {"role": "user", "content": "extract news tags from the following news without any signs or numbers and put a comma between , each tag"},
-        {"role": "user", "content": f"the title: {title}، the summary: {summary}"}
+        {"role": "user", "content": f"the title: {title}, the summary: {summary}"},
+        {"role": "user", "content": "the tags should be in following categories:"},
+        {"role": "user", "content": "'تصنيف عام', 'أماكن', 'أحداث', 'أشخاص'"},
+        {"role": "user", "content": "(اقتصاد, فن, سياسة, أخبار, رياضة, تكنولوجيا, صحة) التصنيف العام يندرج تحته تلك العلامات"},
+        {"role": "user", "content": "إليك مثال: عنوان الخبر: الجيش الإسرائيلي ينذر سكان 5 بلدات في جنوب لبنان بإخلائها"},
+        {"role": "user", "content": "إليك مثال: ملخص الخبر: أنذر الجيش الإسرائيلي سكان 5 بلدات في جنوب لبنان بإخلائها الفوري تمهيدا لقصفها, زاعما أن نشاطات 'حزب الله' تجبره على العمل بقوة ضده في المناطق التي يتم إنذارها."},
+        {"role": "user", "content": "التصنيفات ستكون: الاماكن: جنوب لبنان, التصنيف العام: أخبار, الاحداث: قصف, الاشخاص : الجيش الاسرائيلي, حزب الله"},
+        {
+            "role": "user",
+            "content": "return as a python dict with the keys: 'تصنيف عام', 'أماكن', 'أحداث', 'أشخاص' and the values as lists and dont write format of code"
+        },
+        {"role": "user", "content": "لا تضع الدول والمدن مثل الولايات المتحده و واشنطن وغيرها ضمن الاشخاص"},
+        {
+            "role": "user",
+            "content": '{"تصنيف عام": ["أخبار"], "أماكن": ["جنوب لبنان"], "أحداث": ["قصف"], "أشخاص": ["الجيش الاسرائيلي", "حزب الله"]}'
+        }
     ]
+
 
     response = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=messages
     )
-    keywords = response.choices[0].message['content'].strip().split(", ")
+    keywords = response.choices[0].message['content'].strip()
     return keywords
 
 
@@ -55,56 +74,98 @@ def generate_summary(titles: list, descriptions: list, urls: list):
     
 def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
     feed = feedparser.parse(rss_url)
-        
-    # Fetch all existing feeds
-    existing_feeds = Feed.objects.filter(
-        external_id__in=[entry['id'] for entry in feed.entries[:limit]],
-        user_id=user_id
-    ).prefetch_related('tags')
+    entries = feed.entries[:limit]
     
-    # Create a dictionary to store existing feeds for efficient lookup
-    existing_feeds_dict = {feed.external_id: feed for feed in existing_feeds}
+    # Predefined categories
+    CATEGORY_NAMES = ["تصنيف عام", "أماكن", "أشخاص", "أحداث"]
+    CATEGORY_MAP = {name: TagCategory.objects.get_or_create(name=name)[0] for name in CATEGORY_NAMES}
+
+    # Fetch existing feeds
+    existing_feeds = set(
+        Feed.objects.filter(
+            external_id__in=[entry['id'] for entry in entries],
+            user_id=user_id
+        ).values_list('external_id', flat=True)
+    )
     
-    unique_tags = set()
-    
-    for entry in feed.entries[:limit]: 
-        # Generate more tags with OpenAI
-        generated_tags = generate_tags_for_feed(entry.title, entry.summary)
-        if entry.get('tags', []):
-            generated_tags.append(entry.get('tags')[0].get('term'))
-        unique_tags.update(generated_tags)
-        
-        print(generated_tags)
-        
-        # create new tags 
-        new_tags = [tag for tag in unique_tags if not Tag.objects.filter(name=tag).exists()]
-        tag_objects = []
-        for tag in new_tags:
-            tag_obj, created = Tag.objects.get_or_create(name=tag)
-            tag_objects.append(tag_obj)
-                
-        # store the news in the Feed model
-        if entry['id'] not in existing_feeds_dict:
-            feed_obj = Feed.objects.create(
+    # Generate tags for all entries
+    all_tags_data = {
+        entry['id']: json.loads(generate_tags_for_feed(entry['title'], entry.get('summary', '')))
+        for entry in entries
+    }
+    print("all_tags_data", all_tags_data)
+
+    all_tag_names = {
+        (tag, category)
+        for tags_data in all_tags_data.values()
+        for category, tags in tags_data.items()
+        for tag in tags
+    }
+
+    existing_tags = {
+        (tag.name, tag.category.name): tag
+        for tag in Tag.objects.filter(
+            Q(name__in=[name for name, _ in all_tag_names]) &
+            Q(category__name__in=[cat for _, cat in all_tag_names])
+        ).select_related('category')
+    }
+    print("existing_tags", existing_tags)
+
+    # Create missing tags safely]
+    for tag_name, category_name in all_tag_names:
+        if (tag_name, category_name) not in existing_tags:
+            try:
+                # Try to create the tag
+                new_tag = Tag.objects.create(
+                    name=tag_name,
+                    category=CATEGORY_MAP[category_name]
+                )
+                existing_tags[(tag_name, category_name)] = new_tag
+            except IntegrityError:
+                try:
+                    # If creation fails, retrieve the tag to handle race conditions
+                    new_tag = Tag.objects.get(
+                        name=tag_name,
+                        category=CATEGORY_MAP[category_name]
+                    )
+                    existing_tags[(tag_name, category_name)] = new_tag
+                except Tag.DoesNotExist:
+                    # Log the issue if both creation and retrieval fail
+                    raise RuntimeError(f"Failed to create or retrieve tag: {tag_name}, category: {category_name}")
+
+    # Prepare new feeds and tags
+    new_feeds = []
+    feed_tags = []
+
+    for entry in entries:
+        if entry['id'] not in existing_feeds:
+            new_feed = Feed(
                 external_id=entry['id'],
                 title=entry['title'],
                 url=entry['link'],
                 description=entry.get('summary', ''),
                 active=True,
-                user_id=user_id
+                user_id=user_id,
             )
-            feed_obj.tags.set(Tag.objects.filter(name__in=generated_tags))
-            existing_feeds_dict[entry['id']] = feed_obj
-        else:
-            # update existing feed
-            feed_obj = existing_feeds_dict[entry['id']]
-    
-    # make feeds that are from 15 minutes ago inactive
-    Feed.objects.filter(
-        created_at__lt=datetime.now() - timedelta(minutes=15)
-    ).update(active=False)
-        
-    return feed.entries[:limit]
+            new_feeds.append(new_feed)
+
+            # Collect tags for this feed
+            entry_tags = [
+                existing_tags[(tag, category)]
+                for category, tags in all_tags_data[entry['id']].items()
+                for tag in tags
+            ]
+            feed_tags.extend((new_feed, tag) for tag in entry_tags)
+
+    # Bulk create feeds and feed-tag relationships
+    if new_feeds:
+        Feed.objects.bulk_create(new_feeds)
+        Feed.tags.through.objects.bulk_create([
+            Feed.tags.through(feed_id=feed.id, tag_id=tag.id)
+            for feed, tag in feed_tags
+        ])
+
+    return entries
 
 
 def get_news_from_multiple_sources(data, request):
@@ -121,7 +182,7 @@ def get_news_from_multiple_sources(data, request):
         rss_urls[source.name] = source.url
         
     all_news = {}
-    limit = 10
+    limit = 3
     for source, url in rss_urls.items():
         news_entries = fetch_news_from_rss(url, limit, user_id)
         all_news[source] = news_entries

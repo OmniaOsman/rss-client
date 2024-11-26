@@ -3,46 +3,64 @@ from accounts.models import User
 import re
 
 
-def arabic_slugify(str):
-    """
-    Custom slugify function that handles Arabic text by transliterating Arabic characters
-    to their closest English representation.
-    """
-    arabic_map = {
-        'ا': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh',
-        'د': 'd', 'ذ': 'th', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's',
-        'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
-        'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y',
-        'ة': 'h', 'ى': 'a', 'ء': 'a', 'ؤ': 'o', 'ئ': 'e', 'إ': 'e', 'أ': 'a',
-        'آ': 'a', 'ض': 'd', 'ص': 's', 'ث': 'th', 'ق': 'q', 'ف': 'f', 'غ': 'gh',
-        'ع': 'a', 'ه': 'h', 'خ': 'kh', 'ح': 'h', 'ج': 'j', 'ش': 'sh', 'س': 's',
-        'ي': 'y', 'ب': 'b', 'ل': 'l', 'ا': 'a', 'ت': 't', 'ن': 'n', 'م': 'm',
-        'ك': 'k', 'ط': 't', 'ذ': 'th', 'ء': 'a', 'ؤ': 'o', 'ر': 'r', 'ى': 'a',
-        'ة': 'h', 'و': 'w', 'ز': 'z', 'ظ': 'z',
-    }
+# def arabic_slugify(str):
+#     """
+#     Custom slugify function that handles Arabic text by transliterating Arabic characters
+#     to their closest English representation.
+#     """
+#     arabic_map = {
+#         'ا': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh',
+#         'د': 'd', 'ذ': 'th', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's',
+#         'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+#         'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y',
+#         'ة': 'h', 'ى': 'a', 'ء': 'a', 'ؤ': 'o', 'ئ': 'e', 'إ': 'e', 'أ': 'a',
+#         'آ': 'a', 'ض': 'd', 'ص': 's', 'ث': 'th', 'ق': 'q', 'ف': 'f', 'غ': 'gh',
+#         'ع': 'a', 'ه': 'h', 'خ': 'kh', 'ح': 'h', 'ج': 'j', 'ش': 'sh', 'س': 's',
+#         'ي': 'y', 'ب': 'b', 'ل': 'l', 'ا': 'a', 'ت': 't', 'ن': 'n', 'م': 'm',
+#         'ك': 'k', 'ط': 't', 'ذ': 'th', 'ء': 'a', 'ؤ': 'o', 'ر': 'r', 'ى': 'a',
+#         'ة': 'h', 'و': 'w', 'ز': 'z', 'ظ': 'z',
+#     }
     
-    # Convert Arabic characters to English representations
-    str = ''.join(arabic_map.get(char, char) for char in str)
+    # # Convert Arabic characters to English representations
+    # str = ''.join(arabic_map.get(char, char) for char in str)
     
-    # Remove non-word characters and convert spaces to hyphens
-    str = re.sub(r'[^\w\s-]', '', str).strip().lower()
-    str = re.sub(r'[-\s]+', '-', str)
+    # # Remove non-word characters and convert spaces to hyphens
+    # str = re.sub(r'[^\w\s-]', '', str).strip().lower()
+    # str = re.sub(r'[-\s]+', '-', str)
     
-    return str or 'untitled'
+    # return str or 'untitled'
 
 
-class Tag(models.Model):
-    name = models.CharField(max_length=100, unique=True, help_text='tag name')
-    slug = models.SlugField(max_length=100, unique=True, help_text='tag slug')
+class TagCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True, help_text='tag category name')
+    # slug = models.SlugField(max_length=100, unique=True, help_text='tag category slug')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = arabic_slugify(self.name)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = arabic_slugify(self.name)
+    #     super().save(*args, **kwargs)
         
     def __str__(self):
         return self.name
+    
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True, help_text='tag name')
+    # slug = models.SlugField(max_length=100, unique=True, help_text='tag slug')
+    category = models.ForeignKey(TagCategory, on_delete=models.SET_NULL, related_name='tags', null=True, help_text='tag category')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = arabic_slugify(self.name)
+    #     super().save(*args, **kwargs)
+        
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        unique_together = ['name', 'category']
     
     
 class Feed(models.Model):
