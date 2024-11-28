@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 import os
-from celery.schedules import crontab
 from celery import Celery
 from celery.signals import task_failure
 from django.conf import settings
@@ -25,16 +24,6 @@ app.conf.result_backend = settings.CELERY_BROKER_URL
 app.conf.update(
     beat_log_level="DEBUG"
 )
-from celery.schedules import crontab
-
-app.conf.beat_schedule = {
-    # Executes every minute
-    'add-every-monday-morning': {
-        'task': 'rss_client.tasks.send_newsletter',
-        'schedule': crontab(minute='*/1'),
-        'args': (),
-    },
-}
 app.conf.enable_utc = False
 app.conf.timezone = 'Africa/Cairo'
 

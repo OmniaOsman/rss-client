@@ -173,11 +173,25 @@ SPECTACULAR_SETTINGS = {
 
 
 # Celery settings
+from celery.schedules import crontab
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_BEAT_SCHEDULE = {}
+CELERY_BEAT_SCHEDULE = {
+    "rss_client.tasks.fetch_news_for_all_subscribers": {
+        "task": "rss_client.tasks.fetch_news_for_all_subscribers",
+        "schedule": crontab(hour=12, minute=35),  # Run every day morning at 12:35 AM
+    },
+    "rss_client.tasks.summarize_feeds_by_day": {
+        "task": "rss_client.tasks.summarize_feeds_by_day",
+        "schedule": crontab(hour=12, minute=40),  # Run every day morning at 12:40 AM
+    },
+    "rss_client.tasks.send_newsletter": {
+        "task": "rss_client.tasks.send_newsletter",
+        "schedule": crontab(hour=20, minute=45),  # Run every day morning at 12:45 AM
+    },
+}
 
 
 # Internationalization
@@ -215,13 +229,15 @@ LOCALE_PATHS = [
 
 
 # email config
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # For testing
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env('EMAIL_PORT')
-EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+SENDGRID_API_KEY = env('SENDGRID_API_KEY')
+# EMAIL_HOST = env('EMAIL_HOST')
+# EMAIL_PORT = env('EMAIL_PORT')
+# EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+SENDGRID_SANDBOX_MODE = False
 EMAIL_USE_LOCALTIME = True
+SENDGRID_ECHO_TO_STDOUT = True
 DEFAULT_CHARSET = 'utf-8'

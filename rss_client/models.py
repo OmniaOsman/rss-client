@@ -46,7 +46,7 @@ class TagCategory(models.Model):
     
 
 class Tag(models.Model):
-    name = models.CharField(max_length=100, unique=True, help_text='tag name')
+    name = models.CharField(max_length=100, help_text='tag name')
     # slug = models.SlugField(max_length=100, unique=True, help_text='tag slug')
     category = models.ForeignKey(TagCategory, on_delete=models.SET_NULL, related_name='tags', null=True, help_text='tag category')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -65,31 +65,31 @@ class Tag(models.Model):
     
 class Feed(models.Model):
     title = models.CharField(max_length=500, help_text='feed title')
-    url = models.URLField(max_length=5000, unique=True, help_text='rss url')
+    url = models.URLField(max_length=5000,  help_text='rss url')
     description = models.TextField(null=True, help_text='feed description')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='feeds', null=True, help_text='user associated with the feed')
     tags = models.ManyToManyField(Tag, related_name='feeds', help_text='tags associated with the feed')
     active = models.BooleanField(default=True, help_text='feed is still active or not')
-    external_id = models.CharField(max_length=5000, unique=True, help_text='ID from the original news source')
+    external_id = models.CharField(max_length=5000, help_text='ID from the original news source')
     created_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return self.title
     class Meta:
-        unique_together = ('user', 'url')
+        unique_together = ('user', 'url', 'external_id')
         indexes = [
             models.Index(fields=['user', 'url'], name='user_url_index'),
         ]
         
-    def str(self):
-        return self.title
     
     
 class ProcessedFeed(models.Model):
     title = models.CharField(max_length=500, help_text='processed feed title')
     summary = models.TextField(help_text='processed feed summary')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='processed_feeds', null=True, help_text='user associated with the processed feed')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        
         return self.title
 
 
@@ -102,12 +102,11 @@ class Report(models.Model):
 
 
 class Subscriber(models.Model):
-    email = models.EmailField(unique=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='subscribers', null=True, help_text='user associated with the subscriber')
     is_active = models.BooleanField(default=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
     unsubscribed_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.email
+        return f'{self.user.first_name} {self.user}, ID {self.user.id}'
     

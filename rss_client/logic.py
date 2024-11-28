@@ -1,7 +1,7 @@
-from django.db import IntegrityError
 import feedparser
 import openai
 from django.conf import settings
+from accounts.models import User
 from sources.models import Source
 from .models import Feed, Subscriber, Tag, ProcessedFeed, TagCategory
 from rest_framework.validators import ValidationError
@@ -71,7 +71,27 @@ def generate_summary(titles: list, descriptions: list, urls: list):
     
     return response.choices[0].message['content'].strip()
     
-    
+
+def get_existing_feeds(entries, user_id):
+    """Fetch existing feeds to avoid duplicates."""
+    existing_feeds = set(
+        Feed.objects.filter(
+            external_id__in=[entry['id'] for entry in entries],
+            user_id=user_id
+        ).values_list('external_id', flat=True)
+    )
+    return existing_feeds
+
+
+def generate_tags_for_all_entries(entries):
+    """Generate tags for each RSS entry."""
+    all_tags_data = {
+        entry['id']: json.loads(generate_tags_for_feed(entry['title'], entry.get('summary', '')))
+        for entry in entries
+    }
+    return all_tags_data
+
+
 def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
     feed = feedparser.parse(rss_url)
     entries = feed.entries[:limit]
@@ -81,19 +101,10 @@ def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
     CATEGORY_MAP = {name: TagCategory.objects.get_or_create(name=name)[0] for name in CATEGORY_NAMES}
 
     # Fetch existing feeds
-    existing_feeds = set(
-        Feed.objects.filter(
-            external_id__in=[entry['id'] for entry in entries],
-            user_id=user_id
-        ).values_list('external_id', flat=True)
-    )
-    
+    existing_feeds = get_existing_feeds(entries, user_id
+                                        )
     # Generate tags for all entries
-    all_tags_data = {
-        entry['id']: json.loads(generate_tags_for_feed(entry['title'], entry.get('summary', '')))
-        for entry in entries
-    }
-    print("all_tags_data", all_tags_data)
+    all_tags_data = generate_tags_for_all_entries(entries)
 
     all_tag_names = {
         (tag, category)
@@ -109,29 +120,40 @@ def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
             Q(category__name__in=[cat for _, cat in all_tag_names])
         ).select_related('category')
     }
-    print("existing_tags", existing_tags)
 
-    # Create missing tags safely]
-    for tag_name, category_name in all_tag_names:
-        if (tag_name, category_name) not in existing_tags:
-            try:
-                # Try to create the tag
-                new_tag = Tag.objects.create(
-                    name=tag_name,
-                    category=CATEGORY_MAP[category_name]
-                )
-                existing_tags[(tag_name, category_name)] = new_tag
-            except IntegrityError:
-                try:
-                    # If creation fails, retrieve the tag to handle race conditions
-                    new_tag = Tag.objects.get(
-                        name=tag_name,
-                        category=CATEGORY_MAP[category_name]
-                    )
-                    existing_tags[(tag_name, category_name)] = new_tag
-                except Tag.DoesNotExist:
-                    # Log the issue if both creation and retrieval fail
-                    raise RuntimeError(f"Failed to create or retrieve tag: {tag_name}, category: {category_name}")
+    # Prepare tags to create as Tag instances
+    tags_to_create = [
+        Tag(name=tag_name, category=CATEGORY_MAP[category_name])
+        for tag_name, category_name in all_tag_names
+        if (tag_name, category_name) not in existing_tags
+    ]
+
+    if tags_to_create:
+        # Filter out tags already in the database (case-insensitive and unique category match)
+        existing_tag_names = Tag.objects.filter(
+            Q(name__in=[tag.name for tag in tags_to_create]) &
+            Q(category__in=[tag.category for tag in tags_to_create])
+        ).values_list('name', 'category')
+
+        # Exclude tags already in the database
+        tags_to_create = [
+            tag for tag in tags_to_create
+            if (tag.name, tag.category) not in existing_tag_names
+        ]
+
+    # Bulk create the remaining tags
+    if tags_to_create:
+        Tag.objects.bulk_create(tags_to_create)
+
+        # Update existing_tags with newly created tags
+        new_tags = Tag.objects.filter(
+            name__in=[tag.name for tag in tags_to_create],
+            category__in=[tag.category for tag in tags_to_create]
+        )
+        existing_tags.update({
+            (tag.name, tag.category.name): tag
+            for tag in new_tags
+        })
 
     # Prepare new feeds and tags
     new_feeds = []
@@ -245,15 +267,15 @@ def subscribe_to_newsletter(data, request):
     """Subscribe to newsletter"""
     email = data.get('email')
 
+    # get the user object
+    user = User.objects.filter(email=email).first()
+
     # check if subscriber already exists
-    if Subscriber.objects.filter(email=email).exists():
+    if Subscriber.objects.filter(user=user).exists():
         # update is_active to true
-        Subscriber.objects.filter(email=email).update(is_active=True, subscribed_at=datetime.now())
-    else:
-        # extract name from email
-        name = email.split('@')[0]
-        
-        Subscriber.objects.create(email=email, name=name, is_active=True, subscribed_at=datetime.now())
+        Subscriber.objects.filter(user=user).update(is_active=True, subscribed_at=datetime.now())
+    else:        
+        Subscriber.objects.create(user=user, is_active=True, subscribed_at=datetime.now())
     
     return {
         'success': True,
@@ -264,7 +286,12 @@ def subscribe_to_newsletter(data, request):
 def unsubscribe_from_newsletter(data, request):
     """Unsubscribe from newsletter"""
     email = data.get('email')
-    Subscriber.objects.filter(email=email).update(is_active=False, unsubscribed_at=datetime.now())
+
+    # get the user object
+    user = User.objects.filter(email=email).first()
+
+    # update is_active to false
+    Subscriber.objects.filter(user=user).update(is_active=False, unsubscribed_at=datetime.now())
     
     return {
         'success': True,
