@@ -7,6 +7,7 @@ from django.conf import settings
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
 from django.db.models import Prefetch
+from django.core.mail import send_mail
 
 
 @shared_task
