@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_celery_beat',
     'drf_spectacular',
-    'channels',
     'rss_client',
     'accounts',
     'sources',
@@ -181,15 +180,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "rss_client.tasks.fetch_news_for_all_subscribers": {
         "task": "rss_client.tasks.fetch_news_for_all_subscribers",
-        "schedule": crontab(hour=12, minute=35),  # Run every day morning at 12:35 AM
+        "schedule": crontab(hour=16, minute=6),  # Run every day morning at 12:35 AM
     },
     "rss_client.tasks.summarize_feeds_by_day": {
         "task": "rss_client.tasks.summarize_feeds_by_day",
-        "schedule": crontab(hour=12, minute=40),  # Run every day morning at 12:40 AM
+        "schedule": crontab(hour=16, minute=8),  # Run every day morning at 12:40 AM
     },
     "rss_client.tasks.send_newsletter": {
         "task": "rss_client.tasks.send_newsletter",
-        "schedule": crontab(hour=20, minute=45),  # Run every day morning at 12:45 AM
+        "schedule": crontab(hour=16, minute=9),  # Run every day morning at 12:45 AM
     },
 }
 
@@ -217,27 +216,15 @@ LOCALE_PATHS = [
 ]
 
 
-# websocket config
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [(env('REDIS_HOST'), env('REDIS_PORT'))],
-#         },
-#     },
-# }
-
-
 # email config
 EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 SENDGRID_API_KEY = env('SENDGRID_API_KEY')
-# EMAIL_HOST = env('EMAIL_HOST')
-# EMAIL_PORT = env('EMAIL_PORT')
-# EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-SENDGRID_SANDBOX_MODE = False
-EMAIL_USE_LOCALTIME = True
-SENDGRID_ECHO_TO_STDOUT = True
-DEFAULT_CHARSET = 'utf-8'
+EMAIL_USE_TLS = True
+# SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+# SENDGRID_ECHO_TO_STDOUT = True
+# DEFAULT_CHARSET = 'utf-8'

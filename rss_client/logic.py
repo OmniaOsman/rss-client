@@ -101,8 +101,8 @@ def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
     CATEGORY_MAP = {name: TagCategory.objects.get_or_create(name=name)[0] for name in CATEGORY_NAMES}
 
     # Fetch existing feeds
-    existing_feeds = get_existing_feeds(entries, user_id
-                                        )
+    existing_feeds = get_existing_feeds(entries, user_id)
+    
     # Generate tags for all entries
     all_tags_data = generate_tags_for_all_entries(entries)
 

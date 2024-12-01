@@ -25,7 +25,7 @@ def summarize_feeds_by_day():
     day_date = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d").date() 
 
     # Get the feeds created today
-    feeds_queryset = Feed.objects.filter(created_at__date=day_date)
+    feeds_queryset = Feed.objects.filter(created_at__date=day_date, active=True)
 
     # Prefetch active subscribers with their associated users and today's feeds
     subscribers = Subscriber.objects.filter(
@@ -63,7 +63,10 @@ def summarize_feeds_by_day():
                 created_at=datetime.now(),
                 user=subscriber.user
             )
-        
+
+            # make feeds inactive
+            feeds_queryset.update(active=False)
+            
         except Exception as e:
             print(f"Error processing subscriber {subscriber.id}: {e}")
 
@@ -93,18 +96,22 @@ def send_newsletter():
 
         # Prefetch ProcessedFeeds for active subscribers
         subscribers = Subscriber.objects.filter(
-            is_active=True, 
+            is_active=True,
             user__isnull=False
         ).select_related('user').prefetch_related(
-            Prefetch('user__processed_feeds', 
-                     queryset=ProcessedFeed.objects.filter(created_at__date=today),
-                     to_attr='todays_summaries')
+            Prefetch(
+                'user__processed_feeds',
+                queryset=ProcessedFeed.objects.filter(created_at__date=today),
+                to_attr='todays_summaries'
+            )
         )
 
         # Initialize SendGrid client
         sg = SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
 
         for subscriber in subscribers:
+            if subscriber.user.email == 'first_user@gmail.com':
+                continue
             try:
                 # Use prefetched summaries
                 user_summaries = subscriber.user.todays_summaries
@@ -114,7 +121,7 @@ def send_newsletter():
                     print(f"No summaries for user {subscriber.user.email}")
                     continue
 
-                # Get the first summary 
+                # Get the first summary
                 summary = user_summaries[0]
                 title = summary.title
                 summary_text = summary.summary
@@ -133,23 +140,22 @@ def send_newsletter():
                     </body>
                 </html>
                 '''
-                
+
                 # Create plain text content
                 text_content = strip_tags(html_content)
 
-                # Create email message
-                from_email = Email(settings.DEFAULT_FROM_EMAIL)
-                to_email = To(subscriber.user.email)
-                subject = 'Newsletter of the day'
-                content = Content("text/plain", text_content)
+                # Create SendGrid Mail object
+                message = Mail(
+                    from_email=Email(settings.DEFAULT_FROM_EMAIL),
+                    to_emails=To(subscriber.user.email),
+                    subject='Newsletter of the day',
+                    html_content=Content("text/html", html_content),
+                )
+                print("from_email", settings.DEFAULT_FROM_EMAIL)
+                message.add_content(Content("text/plain", text_content))
 
-                # Create Mail object
-                mail = Mail(from_email, to_email, subject, content)
-                mail.add_content(Content("text/html", html_content))
-
-                # Send email via SendGrid
-                response = sg.client.mail.send.post(request_body=mail.get())
-                
+                # Send the email
+                response = sg.send(message)
                 print(f"Email sent to {subscriber.user.email}, status: {response.status_code}")
 
             except Exception as e:
