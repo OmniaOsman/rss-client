@@ -94,21 +94,35 @@ def summarize_feeds_by_day():
             print(f"Error processing subscriber {subscriber.id}: {e}")
 
 
-# @shared_task(name='summarize_feeds')
-# def summarize_feeds(titles, descriptions, urls):
-#     from rss_client.logic import generate_summary
-#     result = generate_summary(titles, descriptions, urls)
-    
-#     # Convert the string back to a tuple
-#     result_tuple = ast.literal_eval(result)
+@shared_task(name='summarize_feeds')
+def summarize_feeds(titles, descriptions, urls):
+    """
+    Summarize a list of feeds.
 
-#     ProcessedFeed.objects.create(
-#         title=result_tuple[0],
-#         summary=result_tuple[1],
-#         created_at=datetime.now(),
-#     )
+    This task generates a summary for the given titles, descriptions, and urls of a list of feeds.
+    It then creates a ProcessedFeed object with the summary and today's date.
+
+    Args:
+        titles (list): A list of titles for the feeds.
+        descriptions (list): A list of descriptions for the feeds.
+        urls (list): A list of urls for the feeds.
+
+    Returns:
+        tuple: A tuple containing the title and summary of the ProcessedFeed object.
+    """
+    from rss_client.logic import generate_summary
+    result = generate_summary(titles, descriptions, urls)
     
-#     return result_tuple[0], result_tuple[1]
+    # Convert the string back to a tuple
+    result_tuple = ast.literal_eval(result)
+
+    ProcessedFeed.objects.create(
+        title=result_tuple[0],
+        summary=result_tuple[1],
+        created_at=datetime.now(),
+    )
+    
+    return result_tuple[0], result_tuple[1]
 
 
 @shared_task
