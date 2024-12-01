@@ -11,6 +11,14 @@ from django.db.models import Prefetch
 
 @shared_task
 def fetch_news_for_all_subscribers():
+    """
+    Fetch news for all subscribers by retrieving news from multiple sources.
+
+    This task iterates over all the active subscribers and calls the function 
+    `get_news_from_multiple_sources` for each subscriber to fetch the latest news 
+    and updates. This ensures that each subscriber has access to the most recent 
+    news content from various sources.
+    """
     from rss_client.logic import get_news_from_multiple_sources
     # get all the subscribers
     subscribers = Subscriber.objects.all()
@@ -21,6 +29,21 @@ def fetch_news_for_all_subscribers():
 
 @shared_task
 def summarize_feeds_by_day():
+    """
+    Summarize the feeds created today for all active subscribers.
+
+    This task runs once a day and summarizes the feeds created today for all active 
+    subscribers. It does this by first fetching the feeds created today, then generating 
+    a summary for each subscriber using the titles and descriptions of the top 3 most 
+    recent feeds. The summary is then saved as a ProcessedFeed object associated with 
+    the subscriber's user.
+
+    If a subscriber does not have any feeds associated with them, this task will fetch 
+    news from multiple sources for the subscriber using the function 
+    `get_news_from_multiple_sources`.
+
+    After the task is complete, all the feeds created today are made inactive.
+    """
     from rss_client.logic import generate_summary, get_news_from_multiple_sources
     day_date = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d").date() 
 
@@ -71,21 +94,21 @@ def summarize_feeds_by_day():
             print(f"Error processing subscriber {subscriber.id}: {e}")
 
 
-@shared_task(name='summarize_feeds')
-def summarize_feeds(titles, descriptions, urls):
-    from rss_client.logic import generate_summary
-    result = generate_summary(titles, descriptions, urls)
+# @shared_task(name='summarize_feeds')
+# def summarize_feeds(titles, descriptions, urls):
+#     from rss_client.logic import generate_summary
+#     result = generate_summary(titles, descriptions, urls)
     
-    # Convert the string back to a tuple
-    result_tuple = ast.literal_eval(result)
+#     # Convert the string back to a tuple
+#     result_tuple = ast.literal_eval(result)
 
-    ProcessedFeed.objects.create(
-        title=result_tuple[0],
-        summary=result_tuple[1],
-        created_at=datetime.now(),
-    )
+#     ProcessedFeed.objects.create(
+#         title=result_tuple[0],
+#         summary=result_tuple[1],
+#         created_at=datetime.now(),
+#     )
     
-    return result_tuple[0], result_tuple[1]
+#     return result_tuple[0], result_tuple[1]
 
 
 @shared_task

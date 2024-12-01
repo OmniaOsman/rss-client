@@ -93,6 +93,14 @@ def generate_tags_for_all_entries(entries):
 
 
 def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
+    """
+    Fetches news from an RSS feed and stores them in the database.
+
+    :param rss_url: The URL of the RSS feed
+    :param limit: The maximum number of news entries to fetch
+    :param user_id: The ID of the user to associate with the news entries
+    :return: A list of news entries, without duplicates, and with tags associated
+    """
     feed = feedparser.parse(rss_url)
     entries = feed.entries[:limit]
     
@@ -191,6 +199,24 @@ def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
 
 
 def get_news_from_multiple_sources(data, request):
+    """
+    Fetches news from multiple RSS sources associated with the current user.
+
+    This function takes an empty request body and the current user's ID from the request.
+    It fetches all the RSS sources associated with the user, and for each source,
+    fetches the latest news entries from the RSS feed using the `fetch_news_from_rss` function.
+    It then returns a dictionary with the source name as key and the list of news entries as value.
+
+    Args:
+        data (dict): Empty request body.
+        request: The HTTP request object containing user information.
+
+    Returns:
+        dict: A dictionary containing the success status, a message, and the fetched news entries.
+            - 'success' (bool): Indicates if the operation was successful.
+            - 'message' (str): A message indicating the result of the operation.
+            - 'payload' (dict): A dictionary with the source name as key and the list of news entries as value.
+    """
     user_id: int = request.user.id
     
     # Get sources associated with the user
@@ -226,6 +252,22 @@ def get_tags():
 
 
 def summarize_feeds_by_day(data, request):
+    """
+    Summarize all feeds created by the user on a given day.
+
+    If a ProcessedFeed object is found for the given day, return it.
+    Otherwise, run a background task to summarize the feeds and return the task ID.
+
+    Args:
+        data (dict): Unused
+        request: HTTP request object containing user information.
+
+    Returns:
+        dict: A dictionary containing the success status, a message, and the task ID or the ProcessedFeed object.
+            - 'success' (bool): Indicates if the operation was successful.
+            - 'message' (str): A message indicating the result of the operation.
+            - 'payload' (str or dict): The task ID or the ProcessedFeed object.
+    """
     user_id: int = request.user.id
     day_date = datetime.strptime(request.GET.get('day_date', datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d").date() 
 

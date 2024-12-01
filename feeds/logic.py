@@ -48,8 +48,6 @@ def get_dynamic_filter(data, request):
             tag_id=ArrayAgg('tags__id', distinct=True))
         .values('name', 'tag_id').distinct().order_by('name')
     )
-
-    print(tags)
     
     return {
         'success': True,
