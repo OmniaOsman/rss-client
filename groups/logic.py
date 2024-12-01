@@ -7,7 +7,6 @@ def get_groups(data, request):
     """
     user_id: int = request.user.id
     groups = list(Group.objects.filter(user_id=user_id).values())
-    print(groups)
 
     return {
         'success': True,
