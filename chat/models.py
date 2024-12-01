@@ -13,13 +13,3 @@ class UserQuery(models.Model):
     
     def __str__(self):
         return self.question
-
-
-class ConversationLog(models.Model):
-    query = models.ForeignKey('UserQuery', null=True, on_delete=models.CASCADE, related_name='conversation_logs', help_text='query associated with the conversation log')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversation_logs', help_text='user associated with the conversation log')
-    message = models.TextField(help_text='conversation message')
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return self.message

@@ -1,28 +1,24 @@
-# # views.py
+from .serializers import AskQuestionRequest, AskQuestionResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .logic import test_internationalization
-# from .models import UserQuery, ConversationLog
-# # from .serializers import UserQuerySerializer, ConversationLogSerializer
-# from rest_framework.permissions import IsAuthenticated
+from .logic import test_internationalization, ask_question
+from rss_project.utils import process_request
+from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
 
-# class UserQueryViewSet(viewsets.ModelViewSet):
-#     queryset = UserQuery.objects.all()
-#     # serializer_class = UserQuerySerializer
-#     permission_classes = [IsAuthenticated]  
 
-#     def perform_create(self, serializer):
-#         # Automatically associate the current user with the query
-#         serializer.save(user=self.request.user)
+class ChatAPI(APIView):
+    permission_classes = [IsAuthenticated]
 
-# class ConversationLogViewSet(viewsets.ModelViewSet):
-#     queryset = ConversationLog.objects.all()
-#     # serializer_class = ConversationLogSerializer
-#     permission_classes = [IsAuthenticated]
+    @extend_schema(request=AskQuestionRequest, responses=AskQuestionResponse)
+    def post(self, request):
+        return process_request(
+            AskQuestionRequest, 
+            AskQuestionResponse, 
+            ask_question, 
+            request
+        )
 
-#     def perform_create(self, serializer):
-#         # Associate the user with the conversation log
-#         serializer.save(user=self.request.user)
 
 class Test(APIView):
     def get(self, request):
