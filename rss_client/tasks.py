@@ -62,38 +62,31 @@ def summarize_feeds_by_day():
     ).select_related('user')
 
     for subscriber in subscribers:
-        try:
-            # Use the prefetched feeds
-            feeds = subscriber.user.todays_feeds
+        # Use the prefetched feeds
+        feeds = subscriber.user.todays_feeds
 
-            if not feeds:
-                get_news_from_multiple_sources(data={}, request=subscriber)
+        if not feeds:
+            get_news_from_multiple_sources(data={}, request=subscriber)
 
-            titles = [feed.title for feed in feeds[:3]]
-            descriptions = [feed.description for feed in feeds[:3]]
-            urls = [feed.url for feed in feeds[:3]]
+        titles = [feed.title for feed in feeds]
+        descriptions = [feed.description for feed in feeds]
+        urls = [feed.url for feed in feeds]
 
-            # Generate the summary
-            result = generate_summary(titles, descriptions, urls)
+        # Generate the summary
+        result = generate_summary(titles, descriptions, urls)
+        print("result", result)
+
+        # Create a ProcessedFeed object for the subscriber's user
+        ProcessedFeed.objects.create(
+            title=result["title"],
+            summary=result["summary"],
+            created_at=datetime.now(),
+            user=subscriber.user
+        )
+
+        # make feeds inactive
+        feeds_queryset.update(active=False)
             
-            # Convert the string back to a tuple
-            result_tuple = ast.literal_eval(result)
-            print("result_tuple", result_tuple)
-
-            # Create a ProcessedFeed object for the subscriber's user
-            ProcessedFeed.objects.create(
-                title=result_tuple[0],
-                summary=result_tuple[1],
-                created_at=datetime.now(),
-                user=subscriber.user
-            )
-
-            # make feeds inactive
-            feeds_queryset.update(active=False)
-            
-        except Exception as e:
-            print(f"Error processing subscriber {subscriber.id}: {e}")
-
 
 @shared_task(name='summarize_feeds')
 def summarize_feeds(titles, descriptions, urls):
@@ -144,9 +137,6 @@ def send_newsletter():
             )
         )
 
-        # Initialize SendGrid client
-        sg = SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-
         for subscriber in subscribers:
             if subscriber.user.email == 'first_user@gmail.com':
                 continue
@@ -182,19 +172,16 @@ def send_newsletter():
                 # Create plain text content
                 text_content = strip_tags(html_content)
 
-                # Create SendGrid Mail object
-                message = Mail(
-                    from_email=Email(settings.DEFAULT_FROM_EMAIL),
-                    to_emails=To(subscriber.user.email),
+                # Send the email using Django's send_mail
+                send_mail(
                     subject='Newsletter of the day',
-                    html_content=Content("text/html", html_content),
+                    message=text_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[subscriber.user.email],
+                    html_message=html_content,
                 )
-                print("from_email", settings.DEFAULT_FROM_EMAIL)
-                message.add_content(Content("text/plain", text_content))
 
-                # Send the email
-                response = sg.send(message)
-                print(f"Email sent to {subscriber.user.email}, status: {response.status_code}")
+                print(f"Email sent to {subscriber.user.email}")
 
             except Exception as e:
                 print(f"Error sending email to {subscriber.user.email}: {e}")
@@ -203,4 +190,3 @@ def send_newsletter():
     except Exception as e:
         print(f"Error in sending newsletter: {e}")
         raise
-

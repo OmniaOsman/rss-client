@@ -29,7 +29,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -155,9 +155,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'EXCEPTION_HANDLER': 'rss_project.exception.custom_exception_handler',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
 }
@@ -180,15 +180,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "rss_client.tasks.fetch_news_for_all_subscribers": {
         "task": "rss_client.tasks.fetch_news_for_all_subscribers",
-        "schedule": crontab(hour=16, minute=6),  # Run every day morning at 12:35 AM
+        "schedule": crontab(hour=17, minute=14),  # Run every day morning at 12:35 AM
     },
     "rss_client.tasks.summarize_feeds_by_day": {
         "task": "rss_client.tasks.summarize_feeds_by_day",
-        "schedule": crontab(hour=16, minute=8),  # Run every day morning at 12:40 AM
+        "schedule": crontab(hour=17, minute=16),  # Run every day morning at 12:40 AM
     },
     "rss_client.tasks.send_newsletter": {
         "task": "rss_client.tasks.send_newsletter",
-        "schedule": crontab(hour=16, minute=9),  # Run every day morning at 12:45 AM
+        "schedule": crontab(hour=17, minute=18),  # Run every day morning at 12:45 AM
     },
 }
 
@@ -223,6 +223,3 @@ EMAIL_PORT = env('EMAIL_PORT')
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
-# SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-# SENDGRID_ECHO_TO_STDOUT = True
-# DEFAULT_CHARSET = 'utf-8'
