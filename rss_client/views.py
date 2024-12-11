@@ -10,6 +10,7 @@ from rss_client.logic import (
     get_summary_by_id
 )
 from rest_framework import status
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rss_project.utils import process_request
@@ -41,10 +42,15 @@ class TagsList(APIView):
 
 
 class SummaryAPI(ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = []
 
-    def list(self, request):
-        serializer = SummaryRequestSerializer(data=request.query_params)
+    def list(self, request, uid):
+        # append uid of the user to request
+        request_data = request.query_params.copy()
+        request_data['uid'] = uid
+        request._full_data = request_data
+
+        serializer = SummaryRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         response = summarize_feeds_by_day(serializer.validated_data, request)
         return HttpResponse(response, status=status.HTTP_200_OK)

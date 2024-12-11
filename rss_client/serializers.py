@@ -47,7 +47,12 @@ class UnsubscribeResponseSerializer(ResponseSerializer):
 
 
 class SummaryRequestSerializer(serializers.Serializer):
-    day_date = serializers.DateField(default=datetime.now().strftime("%Y-%m-%d"))
+    uid = serializers.UUIDField(required=False)
+
+    def validate_uid(self, uid):
+        if not User.objects.filter(uid=uid).exists():
+            raise serializers.ValidationError("User does not exist")
+        return uid
 
 
 class SummaryByIDRequestSerializer(serializers.Serializer):

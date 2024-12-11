@@ -38,3 +38,12 @@ def login_user(data, request):
         'message': 'User logged in successfully',
         'payload': response
     }
+
+
+def get_uuid_for_user(data, request):
+    uid = request.user.uid
+    return {
+        'success': True,
+        'message': 'UID fetched successfully',
+        'payload': uid
+    }

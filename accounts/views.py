@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from .serializers import *
-from .logic import register_user, login_user
+from .logic import get_uuid_for_user, register_user, login_user
 from drf_spectacular.utils import extend_schema
 from rss_project.utils import process_request
+from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterView(APIView):
@@ -29,3 +30,16 @@ class LoginView(APIView):
             request
         )
         
+
+class RetriveUUIDView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @extend_schema(responses=UUIDSerializerResponse)
+    def get(self, request):
+        return process_request(
+            None,
+            UUIDSerializerResponse,
+            get_uuid_for_user,
+            request
+        )
+    

@@ -49,3 +49,7 @@ class LoginSerializer(serializers.Serializer):
 
 class LoginSerializerResponse(ResponseSerializer):
     payload = LoginResponse()
+
+
+class UUIDSerializerResponse(ResponseSerializer):
+    payload = serializers.UUIDField()

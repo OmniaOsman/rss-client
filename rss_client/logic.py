@@ -356,11 +356,11 @@ import xml.etree.ElementTree as ET
 
 
 def summarize_feeds_by_day(data, request):
-    day_date = data.get("day_date")
-    user_id = request.user.id  
+    uid = data.get('uid')
+    user_id = User.objects.get(uid=uid).id
 
     # Filter processed feeds for the given date
-    processed_feeds = ProcessedFeed.objects.filter(user_id=2)
+    processed_feeds = ProcessedFeed.objects.filter(user_id=user_id)
 
     # Create the RSS XML structure
     rss = ET.Element('rss', {
