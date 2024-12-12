@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from feeds.serializers import FeedsSerializer
 from groups.models import Group
 from rss_project.utils import ResponseSerializer
 from .models import Source
@@ -9,10 +10,11 @@ class SourceSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     user_id = serializers.IntegerField(required=False, allow_null=True)
     group_id = serializers.IntegerField(required=False, allow_null=True)
+    feeds = FeedsSerializer(many=True, required=False)
     
     class Meta:
         model = Source
-        fields = ['id', 'name', 'url', 'language_code', 'group_id', 'user_id', 'created_at']
+        fields = ['id', 'name', 'url', 'language_code', 'group_id', 'user_id', 'created_at', 'feeds']
         
 
 # ---------------------------------- GET Serializer ----------------------------------

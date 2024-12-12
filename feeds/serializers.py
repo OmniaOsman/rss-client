@@ -22,6 +22,7 @@ class FeedsSerializer(serializers.Serializer):
     group_id = serializers.IntegerField(required=False, allow_null=True)
     description = serializers.CharField(required=False)
     title = serializers.CharField(required=False)
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
 
     
 # ---------------------------------- GET Serializer ----------------------------------

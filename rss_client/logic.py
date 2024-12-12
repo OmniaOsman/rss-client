@@ -190,7 +190,7 @@ def generate_tags_for_all_entries(entries):
     return all_tags_data
 
 
-def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
+def fetch_news_from_rss(rss_url: str, limit: int, source_id: int, user_id: int = None):
     """
     Fetches news from an RSS feed and stores them in the database.
 
@@ -274,6 +274,7 @@ def fetch_news_from_rss(rss_url: str, limit: int, user_id: int = None):
                 description=entry.get("summary", ""),
                 active=True,
                 user_id=user_id,
+                source_id=source_id,
             )
             new_feeds.append(new_feed)
 
@@ -327,12 +328,11 @@ def get_news_from_multiple_sources(data, request):
     # Get RSS URLs from the sources
     rss_urls = {}
     for source in sources:
-        rss_urls[source.name] = source.url
-
+        rss_urls[source.name] = [source.url, source.id]
     all_news = {}
     limit = 3
-    for source, url in rss_urls.items():
-        news_entries = fetch_news_from_rss(url, limit, user_id)
+    for source, value in rss_urls.items():
+        news_entries = fetch_news_from_rss(value[0], limit, value[1], user_id)
         all_news[source] = news_entries
 
     return {
@@ -357,45 +357,58 @@ import xml.etree.ElementTree as ET
 
 
 def summarize_feeds_by_day(data, request):
-    uid = data.get('uid')
+    uid = data.get("uid")
     user_id = User.objects.get(uid=uid).id
 
     # Filter processed feeds for the given date
     processed_feeds = ProcessedFeed.objects.filter(user_id=user_id)
 
     # Create the RSS XML structure
-    rss = ET.Element('rss', {
-        'version': '2.0',
-        'xmlns:content': 'http://purl.org/rss/1.0/modules/content/',
-        'xmlns:atom': 'http://www.w3.org/2005/Atom',
-        'xmlns:media': 'http://search.yahoo.com/mrss/',
-        'xmlns:georss': 'http://www.georss.org/georss',
-        'xmlns:geo': 'http://www.w3.org/2003/01/geo/wgs84_pos#'
-    })
-    channel = ET.SubElement(rss, 'channel')
+    rss = ET.Element(
+        "rss",
+        {
+            "version": "2.0",
+            "xmlns:content": "http://purl.org/rss/1.0/modules/content/",
+            "xmlns:atom": "http://www.w3.org/2005/Atom",
+            "xmlns:media": "http://search.yahoo.com/mrss/",
+            "xmlns:georss": "http://www.georss.org/georss",
+            "xmlns:geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+        },
+    )
+    channel = ET.SubElement(rss, "channel")
 
     # Add metadata to the channel
-    ET.SubElement(channel, 'atom:link', {
-        'href': '{domain_name}/api/v1/news/summary',
-        'rel': 'self',
-        'type': 'application/rss+xml'
-    })
-    ET.SubElement(channel, 'title').text = 'Summary of News'
-    ET.SubElement(channel, 'link').text = '{domain_name}/api/v1/news/summary'
-    ET.SubElement(channel, 'managingEditor').text = 'support@example.com (Support)'
-    ET.SubElement(channel, 'webMaster').text = 'webmaster@example.com (Webmaster)'
-    ET.SubElement(channel, 'description').text = 'Example Network RSS Feed'
-    ET.SubElement(channel, 'copyright').text = '© 2024 Example Network'
-    ET.SubElement(channel, 'lastBuildDate').text = datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")
-    ET.SubElement(channel, 'language').text = 'ar'
+    ET.SubElement(
+        channel,
+        "atom:link",
+        {
+            "href": "{domain_name}/api/v1/news/summary",
+            "rel": "self",
+            "type": "application/rss+xml",
+        },
+    )
+    ET.SubElement(channel, "title").text = "Summary of News"
+    ET.SubElement(channel, "link").text = "{domain_name}/api/v1/news/summary"
+    ET.SubElement(channel, "managingEditor").text = "support@example.com (Support)"
+    ET.SubElement(channel, "webMaster").text = "webmaster@example.com (Webmaster)"
+    ET.SubElement(channel, "description").text = "Example Network RSS Feed"
+    ET.SubElement(channel, "copyright").text = "© 2024 Example Network"
+    ET.SubElement(channel, "lastBuildDate").text = datetime.now().strftime(
+        "%a, %d %b %Y %H:%M:%S +0000"
+    )
+    ET.SubElement(channel, "language").text = "ar"
 
     # Add feed items from processed_feeds
     for feed in processed_feeds:
-        item = ET.SubElement(channel, 'item')
-        ET.SubElement(item, 'title').text = feed.title
-        ET.SubElement(item, 'link').text = f"{domain_name}/api/v1/news/summary/{feed.id}"
-        ET.SubElement(item, 'description').text = f"<![CDATA[{feed.summary}]]>"
-        ET.SubElement(item, 'pubDate').text = feed.created_at.strftime("%a, %d %b %Y %H:%M:%S +0000")
+        item = ET.SubElement(channel, "item")
+        ET.SubElement(item, "title").text = feed.title
+        ET.SubElement(item, "link").text = (
+            f"{domain_name}/api/v1/news/summary/{feed.id}"
+        )
+        ET.SubElement(item, "description").text = f"<![CDATA[{feed.summary}]]>"
+        ET.SubElement(item, "pubDate").text = feed.created_at.strftime(
+            "%a, %d %b %Y %H:%M:%S +0000"
+        )
 
     # Convert the XML structure to a string
     rss_feed = ET.tostring(rss, encoding="unicode")
@@ -410,9 +423,7 @@ def subscribe_to_newsletter(data, request):
     subscribe_obj = Subscriber.objects.filter(user=user)
     if subscribe_obj.exists():
         # update is_active to true
-        subscribe_obj.update(
-            is_active=True, subscribed_at=datetime.now()
-        )
+        subscribe_obj.update(is_active=True, subscribed_at=datetime.now())
     else:
         Subscriber.objects.create(
             user=user, is_active=True, subscribed_at=datetime.now()
