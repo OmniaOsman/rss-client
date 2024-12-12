@@ -15,6 +15,7 @@ from xml.etree import ElementTree as ET
 
 tags = []
 openai.api_key = settings.OPENAI_API_KEY
+domain_name = settings.DOMAIN_NAME
 
 
 def generate_tags_for_feed(title: str, summary: str):
@@ -375,12 +376,12 @@ def summarize_feeds_by_day(data, request):
 
     # Add metadata to the channel
     ET.SubElement(channel, 'atom:link', {
-        'href': 'http://localhost:8000/api/v1/news/summary',
+        'href': '{domain_name}/api/v1/news/summary',
         'rel': 'self',
         'type': 'application/rss+xml'
     })
     ET.SubElement(channel, 'title').text = 'Summary of News'
-    ET.SubElement(channel, 'link').text = 'http://localhost:8000/api/v1/news/summary'
+    ET.SubElement(channel, 'link').text = '{domain_name}/api/v1/news/summary'
     ET.SubElement(channel, 'managingEditor').text = 'support@example.com (Support)'
     ET.SubElement(channel, 'webMaster').text = 'webmaster@example.com (Webmaster)'
     ET.SubElement(channel, 'description').text = 'Example Network RSS Feed'
@@ -392,7 +393,7 @@ def summarize_feeds_by_day(data, request):
     for feed in processed_feeds:
         item = ET.SubElement(channel, 'item')
         ET.SubElement(item, 'title').text = feed.title
-        ET.SubElement(item, 'link').text = f"http://localhost:8000/api/v1/news/summary/{feed.id}"
+        ET.SubElement(item, 'link').text = f"{domain_name}/api/v1/news/summary/{feed.id}"
         ET.SubElement(item, 'description').text = f"<![CDATA[{feed.summary}]]>"
         ET.SubElement(item, 'pubDate').text = feed.created_at.strftime("%a, %d %b %Y %H:%M:%S +0000")
 
@@ -403,15 +404,13 @@ def summarize_feeds_by_day(data, request):
 
 def subscribe_to_newsletter(data, request):
     """Subscribe to newsletter"""
-    email = data.get("email")
-
-    # get the user object
-    user = User.objects.filter(email=email).first()
+    user = request.user
 
     # check if subscriber already exists
-    if Subscriber.objects.filter(user=user).exists():
+    subscribe_obj = Subscriber.objects.filter(user=user)
+    if subscribe_obj.exists():
         # update is_active to true
-        Subscriber.objects.filter(user=user).update(
+        subscribe_obj.update(
             is_active=True, subscribed_at=datetime.now()
         )
     else:
@@ -427,7 +426,7 @@ def subscribe_to_newsletter(data, request):
 
 def unsubscribe_from_newsletter(data, request):
     """Unsubscribe from newsletter"""
-    email = data.get("email")
+    email = request.user.email
 
     # get the user object
     user = User.objects.filter(email=email).first()

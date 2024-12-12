@@ -20,10 +20,9 @@ class FeedsSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(required=False, allow_null=True)
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     group_id = serializers.IntegerField(required=False, allow_null=True)
+    description = serializers.CharField(required=False)
+    title = serializers.CharField(required=False)
 
-    class Meta:
-        model = Feed
-        fields = ['id', 'url', 'tag', 'user_id', 'created_at', 'group_id']
     
 # ---------------------------------- GET Serializer ----------------------------------
 class FeedsSerializerGetRequest(serializers.Serializer):

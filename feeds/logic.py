@@ -17,7 +17,7 @@ def get_feeds(data, request):
     feeds = list(
         Feed.objects.filter(**filter_feeds)
         .annotate(tag=ArrayAgg('tags__name', distinct=True))
-        .values().order_by('tag')
+        .values("title", "url", "description", "id", "tag", "created_at").order_by('tag')
     )
     
     return {

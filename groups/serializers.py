@@ -1,16 +1,18 @@
 from rest_framework import serializers
 from groups.models import Group
 from rss_project.utils import ResponseSerializer
+from sources.serializers import SourceSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     created_at = serializers.DateTimeField(format="%Y-%m-%d")
     user_id = serializers.IntegerField(required=False, allow_null=True)
+    sources = SourceSerializer(many=True, required=False)
     
     class Meta:
         model = Group
-        fields = ['id', 'name', 'user_id', 'created_at']
+        fields = ['id', 'name', 'user_id', 'created_at', 'sources']
         
 
 # ---------------------------------- GET Serializer ----------------------------------

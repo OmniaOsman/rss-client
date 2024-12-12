@@ -1,4 +1,6 @@
 from groups.models import Group
+from django.db.models import Prefetch
+from sources.models import Source
 
 
 def get_groups(data, request):
@@ -19,8 +21,8 @@ def retrive_group(data, request):
     """
     Retrieve a single source by its id
     """
-    group = Group.objects.get(id=request.data['group_id'])
-
+    group = Group.objects.filter(id=request.data['group_id']).prefetch_related('sources').first()
+    group.__dict__['sources'] = [source.__dict__ for source in group.sources.all()]
     return {
         'success': True,
         'message': 'Group fetched successfully',

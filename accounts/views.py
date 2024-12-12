@@ -43,3 +43,20 @@ class RetriveUUIDView(APIView):
             request
         )
     
+
+# Front-End Views
+from django.views import View
+from django.shortcuts import render
+
+class RegisterPageView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'accounts/register.html')
+
+class LoginPageView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'accounts/login.html')
+
+
+class HomePageView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'accounts/index.html')

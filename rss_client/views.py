@@ -7,21 +7,18 @@ from rss_client.logic import (
     summarize_feeds_by_day,
     subscribe_to_newsletter,
     unsubscribe_from_newsletter,
-    get_summary_by_id
+    get_summary_by_id,
 )
 from rest_framework import status
-from rest_framework.authentication import BasicAuthentication
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rss_project.utils import process_request
 from .serializers import (
     FeedResponseSerializer,
-    SubscribeRequestSerializer,
-    UnsubscribeRequestSerializer,
     UnsubscribeResponseSerializer,
     SubscribeResponseSerializer,
     SummaryRequestSerializer,
-    SummaryByIDRequestSerializer
+    SummaryByIDRequestSerializer,
 )
 from drf_spectacular.utils import extend_schema
 
@@ -47,18 +44,18 @@ class SummaryAPI(ModelViewSet):
     def list(self, request, uid):
         # append uid of the user to request
         request_data = request.query_params.copy()
-        request_data['uid'] = uid
+        request_data["uid"] = uid
         request._full_data = request_data
 
         serializer = SummaryRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         response = summarize_feeds_by_day(serializer.validated_data, request)
         return HttpResponse(response, status=status.HTTP_200_OK)
-    
+
     def retrieve(self, request, summary_id):
         # append the source id to request
         request_data = request.data.copy()
-        request_data['summary_id'] = summary_id
+        request_data["summary_id"] = summary_id
         request._full_data = request_data
 
         serializer = SummaryByIDRequestSerializer(data=request.data)
@@ -68,25 +65,22 @@ class SummaryAPI(ModelViewSet):
 
 
 class SubscribeAPI(APIView):
-    @extend_schema(
-        request=SubscribeRequestSerializer, responses=SubscribeResponseSerializer
-    )
+    @extend_schema(responses=SubscribeResponseSerializer)
     def post(self, request):
         return process_request(
-            SubscribeRequestSerializer,
+            None,
             SubscribeResponseSerializer,
             subscribe_to_newsletter,
             request,
         )
 
     @extend_schema(
-        request=UnsubscribeRequestSerializer, responses=UnsubscribeResponseSerializer
+        responses=UnsubscribeResponseSerializer
     )
     def put(self, request):
         return process_request(
-            UnsubscribeRequestSerializer,
+            None,
             UnsubscribeResponseSerializer,
             unsubscribe_from_newsletter,
             request,
         )
-

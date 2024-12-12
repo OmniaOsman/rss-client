@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #f7f7f7;
+    }
+    .form-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    .text-center {
+      margin-bottom: 20px;
+    }
+    .required {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Form container -->
+    <div class="form-container">
+      <h3 class="text-center">تسجيل الدخول</h3>
+      <form id="login-form">
+        <div class="mb-3">
+          <label for="email" class="form-label">البريد الإلكتروني <span class="required">*</span></label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">كلمة المرور <span class="required">*</span></label>
+          <input type="password" class="form-control" id="password" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">تسجيل الدخول</button>
+      </form>
+      <div class="text-center mt-3">
+        <a href="http://localhost:8000/accounts/signup" class="text-decoration-none">ليس لديك حساب؟ سجل الآن</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- JavaScript -->
+  <script>
+    const BASE_URL = "http://localhost:8000/api/v1/accounts"; // رابط الـ API الخاص بك
+
+    // تسجيل الدخول
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("البريد الإلكتروني وكلمة المرور مطلوبان.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BASE_URL}/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          alert("تم تسجيل الدخول بنجاح!");
+          // إعادة التوجيه إلى صفحة أخرى أو التعامل مع النجاح
+          window.location.href = "http://localhost:8000/home";
+          // يمكنك أيضًا تخزين التوكن في localStorage أو session storage
+          const responseData = await response.json();
+          console.log(responseData);
+          localStorage.setItem("token", responseData.payload.token);
+        } else {
+          const errorData = await response.json();
+          alert(`خطأ: ${errorData.message}`);
+        }
+      } catch (error) {
+        alert("حدث خطأ أثناء تسجيل الدخول.");
+      }
+    });
+  </script>
+</body>
+</html>
