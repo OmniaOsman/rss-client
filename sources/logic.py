@@ -31,7 +31,7 @@ def retrive_source(data, request):
                 "feeds",
                 queryset=Feed.objects.annotate(
                     tags_list=ArrayAgg("tags__name", distinct=True)
-                ).prefetch_related("tags"),
+                ).prefetch_related("tags").order_by("-created_at"),
             )
         )
         .first()
