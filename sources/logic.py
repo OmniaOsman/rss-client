@@ -4,6 +4,7 @@ import feedparser
 from django.db.models import Prefetch
 from rss_client.models import Feed
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def get_sources(data, request):
@@ -24,6 +25,9 @@ def retrive_source(data, request):
     """
     Retrieve a single source by its id, including feeds and their tags
     """
+    page = data.get("page", 1)
+    size = data.get("size", 5)
+
     source = (
         Source.objects.filter(id=request.data["source_id"])
         .prefetch_related(
@@ -38,18 +42,35 @@ def retrive_source(data, request):
     )
 
     if source:
+        feeds = source.feeds.all()
+        paginator = Paginator(feeds, size)  
+
+        try:
+            feeds_paginated = paginator.page(page)
+        except PageNotAnInteger:
+            feeds_paginated = paginator.page(1)
+        except EmptyPage:
+            feeds_paginated = paginator.page(paginator.num_pages)
+
         source.__dict__["feeds"] = [
             {
                 **feed.__dict__,
                 "tags": [tag.name for tag in feed.tags.all()]
             }
-            for feed in source.feeds.all()
+            for feed in feeds_paginated
         ]
 
     return {
         "success": True,
         "message": "Source fetched successfully",
-        "payload": source.__dict__,
+        "payload": {
+            "data": source.__dict__,
+            "pagination": {
+                "next_page": feeds_paginated.has_next(),
+                "previous_page": feeds_paginated.has_previous(),
+                "total_pages": paginator.num_pages,
+            }
+        },
     }
 
 

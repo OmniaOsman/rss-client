@@ -20,6 +20,8 @@ class SourceSerializer(serializers.ModelSerializer):
 # ---------------------------------- GET Serializer ----------------------------------
 class SourceSerializerGetRequest(serializers.Serializer):
     source_id = serializers.IntegerField(required=False)
+    page = serializers.IntegerField(required=False)
+    size = serializers.IntegerField(required=False)
     
     def validate_source_id(self, value):
         # check if source exists
@@ -27,20 +29,24 @@ class SourceSerializerGetRequest(serializers.Serializer):
             raise serializers.ValidationError("Source does not exist")
         return value
     
-    
-class SourceSerializerGetResponse(ResponseSerializer):
-    def __init__(self, *args, **kwargs):
-        # Call the parent constructor
-        super().__init__(*args, **kwargs)
-        
-        # Access the data from the serializer context
-        data = kwargs.get('data', {})
 
-        # Conditionally set the `many` argument based on the input
-        if isinstance(data.get('payload'), list):
-            self.fields['payload'] = SourceSerializer(many=True, required=False)
-        else:
-            self.fields['payload'] = SourceSerializer(many=False, required=False)
+class PaginationSerializer(serializers.Serializer):
+    next_page = serializers.BooleanField(required=False)
+    previous_page = serializers.BooleanField(required=False)
+    total_pages = serializers.IntegerField(required=False)
+
+
+class RetriveSourceSerializer(serializers.Serializer):
+    data = SourceSerializer(many=False, required=False)
+    pagination = PaginationSerializer(many=False, required=False)
+
+
+class SourceSerializerGetResponse(ResponseSerializer):
+    SourceSerializer(many=True, required=False)
+
+
+class RetrieveSourceSerializerGetResponse(ResponseSerializer):
+    payload = RetriveSourceSerializer()
 
 
 # ---------------------------------- POST Serializer ----------------------------------

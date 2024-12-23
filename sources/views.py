@@ -3,6 +3,7 @@ from sources.logic import add_source, delete_source, edit_source, get_sources, r
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import IsAuthenticated
 from .serializers import (
+    RetrieveSourceSerializerGetResponse,
     SourceSerializerDeleteRequest,
     SourceSerializerDeleteResponse,
     SourceSerializerPatchRequest,
@@ -26,16 +27,18 @@ class SourcesAPI(ModelViewSet):
             request
         )
     
-    @extend_schema(responses=SourceSerializerGetResponse)
+    @extend_schema(parameters=[SourceSerializerGetRequest], responses=RetrieveSourceSerializerGetResponse)
     def retrieve(self, request, source_id):
         # append the source id to request
         request_data = request.data.copy()
         request_data['source_id'] = source_id
+        request_data['page'] = request.query_params.get('page', 1)
+        
         request._full_data = request_data
         
         return process_request(
             SourceSerializerGetRequest,
-            SourceSerializerGetResponse,
+            RetrieveSourceSerializerGetResponse,
             retrive_source,
             request,
         )

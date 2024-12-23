@@ -137,8 +137,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -183,15 +185,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "rss_client.tasks.fetch_news_for_all_subscribers": {
         "task": "rss_client.tasks.fetch_news_for_all_subscribers",
-        "schedule": crontab(hour=17, minute=14),  # Run every day morning at 12:35 AM
+        "schedule": crontab(hour=18, minute=50),  # Run every day morning at 12:35 AM
     },
     "rss_client.tasks.summarize_feeds_by_day": {
         "task": "rss_client.tasks.summarize_feeds_by_day",
-        "schedule": crontab(hour=17, minute=16),  # Run every day morning at 12:40 AM
+        "schedule": crontab(hour=18, minute=59),  # Run every day morning at 12:40 AM
     },
     "rss_client.tasks.send_newsletter": {
         "task": "rss_client.tasks.send_newsletter",
-        "schedule": crontab(hour=17, minute=18),  # Run every day morning at 12:45 AM
+        "schedule": crontab(hour=18, minute=53),  # Run every day morning at 12:45 AM
     },
 }
 
