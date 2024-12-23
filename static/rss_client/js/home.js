@@ -395,6 +395,46 @@ document.getElementById('no-btn').addEventListener('click', async () => {
     }
 });
 
+
+document.getElementById('logout-button').addEventListener('click', async () => {
+    try {
+        const response = await fetch('http://localhost:8000/api/v1/accounts/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${localStorage.getItem('token')}`,
+                'X-CSRFToken': getCookie('csrftoken') // Ensure you include the CSRF token
+            }
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('تم تسجيل الخروج بنجاح');
+            window.location.href = 'http://localhost:8000/accounts/signin'; // Redirect to sign-in page
+        } else {
+            alert('فشل تسجيل الخروج');
+        }
+    } catch (error) {
+        console.error('Error logging out:', error);
+        alert('حدث خطأ أثناء تسجيل الخروج');
+    }
+});
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 // Initialize UID fetch and groups/sources fetch
 fetchUID();
 fetchGroupsAndSources();

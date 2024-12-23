@@ -1,5 +1,6 @@
 from .models import User
 from rest_framework.authtoken.models import Token
+from django.contrib.auth import logout
 
 
 def register_user(data, request):
@@ -46,4 +47,12 @@ def get_uuid_for_user(data, request):
         'success': True,
         'message': 'UID fetched successfully',
         'payload': uid
+    }
+
+
+def logout_user(data, request):
+    logout(request)
+    return {
+        'success': True,
+        'message': 'User logged out successfully',
     }

@@ -55,3 +55,7 @@ class LoginSerializerResponse(ResponseSerializer):
 
 class UUIDSerializerResponse(ResponseSerializer):
     payload = serializers.UUIDField()
+
+
+class LogoutSerializerResponse(ResponseSerializer):
+    pass
