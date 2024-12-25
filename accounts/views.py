@@ -4,6 +4,7 @@ from .logic import get_uuid_for_user, logout_user, register_user, login_user
 from drf_spectacular.utils import extend_schema
 from rss_project.utils import process_request
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
 
 
 class RegisterView(APIView):
@@ -63,13 +64,13 @@ from django.shortcuts import render
 
 class RegisterPageView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'accounts/register.html')
+        return render(request, 'accounts/register.html', {'domain_name': settings.DOMAIN_NAME})
 
 class LoginPageView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'accounts/login.html')
+        return render(request, 'accounts/login.html', {'domain_name': settings.DOMAIN_NAME})
 
 
 class HomePageView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'accounts/index.html')
+        return render(request, 'accounts/index.html', {'domain_name': settings.DOMAIN_NAME})

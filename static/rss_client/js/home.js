@@ -3,7 +3,7 @@ let currentGroupId = null;
 // Fetch UID and display it
 async function fetchUID() {
     try {
-        const response = await fetch('http://localhost:8000/api/v1/accounts/uid', {
+        const response = await fetch('{{ domain_name }}/api/v1/accounts/uid', {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -24,7 +24,7 @@ async function fetchUID() {
 // Fetch groups and sources for the user
 async function fetchGroupsAndSources() {
     try {
-        const response = await fetch('http://localhost:8000/api/v1/groups/', {
+        const response = await fetch('{{ domain_name }}/api/v1/groups/', {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -48,7 +48,7 @@ document.getElementById('add-group-form').addEventListener('submit', async (e) =
 
     const groupName = document.getElementById('group-name').value;
     try {
-        const response = await fetch('http://localhost:8000/api/v1/groups/', {
+        const response = await fetch('{{ domain_name }}/api/v1/groups/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ function addGroupToPage(group) {
 
 async function showSourceDetails(sourceId, page = 1, size = 5) {
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/sources/${sourceId}?page=${page}&size=${size}`, {
+        const response = await fetch(`{{ domain_name }}/api/v1/sources/${sourceId}?page=${page}&size=${size}`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             },
@@ -200,7 +200,7 @@ async function showSourceDetails(sourceId, page = 1, size = 5) {
 // Fetch and display sources for a specific group
 async function fetchSourcesForGroup(groupId) {
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/groups/${groupId}`, {
+        const response = await fetch(`{{ domain_name }}/api/v1/groups/${groupId}`, {
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
             }
@@ -251,7 +251,7 @@ async function deleteSource(sourceId, groupId) {
     if (!confirm('هل أنت متأكد أنك تريد حذف هذا المصدر؟')) return;
 
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/sources/${sourceId}`, {
+        const response = await fetch(`{{ domain_name }}/api/v1/sources/${sourceId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -274,7 +274,7 @@ async function deleteGroup(groupId) {
     if (!confirm('هل أنت متأكد أنك تريد حذف هذه المجموعة؟')) return;
 
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/groups/${groupId}`, {
+        const response = await fetch(`{{ domain_name }}/api/v1/groups/${groupId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -297,7 +297,7 @@ async function deleteSource(sourceId, groupId) {
     if (!confirm('هل أنت متأكد أنك تريد حذف هذا المصدر؟')) return;
 
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/sources/${sourceId}`, {
+        const response = await fetch(`{{ domain_name }}/api/v1/sources/${sourceId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Token ${localStorage.getItem('token')}`
@@ -326,7 +326,7 @@ document.getElementById('add-source-form').addEventListener('submit', async (e) 
 
     const sourceUrl = document.getElementById('source-url').value;
     try {
-        const response = await fetch('http://localhost:8000/api/v1/sources/', {
+        const response = await fetch('{{ domain_name }}/api/v1/sources/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -355,7 +355,7 @@ document.getElementById('add-source-form').addEventListener('submit', async (e) 
 // Handle subscription with Yes/No buttons
 document.getElementById('yes-btn').addEventListener('click', async () => {
     try {
-        const response = await fetch('http://localhost:8000/api/v1/news/subscribe', {
+        const response = await fetch('{{ domain_name }}/api/v1/news/subscribe', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -376,7 +376,7 @@ document.getElementById('yes-btn').addEventListener('click', async () => {
 
 document.getElementById('no-btn').addEventListener('click', async () => {
     try {
-        const response = await fetch('http://localhost:8000/api/v1/news/subscribe', {
+        const response = await fetch('{{ domain_name }}/api/v1/news/subscribe', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -398,7 +398,7 @@ document.getElementById('no-btn').addEventListener('click', async () => {
 
 document.getElementById('logout-button').addEventListener('click', async () => {
     try {
-        const response = await fetch('http://localhost:8000/api/v1/accounts/logout', {
+        const response = await fetch('{{ domain_name }}/api/v1/accounts/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -409,7 +409,7 @@ document.getElementById('logout-button').addEventListener('click', async () => {
         const result = await response.json();
         if (result.success) {
             alert('تم تسجيل الخروج بنجاح');
-            window.location.href = 'http://localhost:8000/accounts/signin'; // Redirect to sign-in page
+            window.location.href = '{{ domain_name }}/accounts/signin'; // Redirect to sign-in page
         } else {
             alert('فشل تسجيل الخروج');
         }

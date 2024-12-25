@@ -141,7 +141,7 @@ def generate_summary(titles, descriptions, urls):
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    response = openai.ChatCompletion.create(model="gpt-4o", messages=messages)
     answer = response.choices[0].message["content"].strip()
 
     # Convert answer to a dictionary using json
@@ -330,7 +330,7 @@ def get_news_from_multiple_sources(data, request):
     for source in sources:
         rss_urls[source.name] = [source.url, source.id]
     all_news = {}
-    limit = 3
+    limit = 5
     for source, value in rss_urls.items():
         news_entries = fetch_news_from_rss(value[0], limit, value[1], user_id)
         all_news[source] = news_entries

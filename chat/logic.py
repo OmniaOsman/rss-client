@@ -155,7 +155,7 @@ def generate_response(feeds_titles, feeds_descriptions, feeds_urls, question):
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    response = openai.ChatCompletion.create(model="gpt-4o", messages=messages)
     answer = response.choices[0].message["content"].strip()
     cleaned_response = answer.replace("\n", " ").strip()
     numbers = re.findall(r"\[(\d+)\]", cleaned_response)

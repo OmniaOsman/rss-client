@@ -65,7 +65,7 @@
         <button type="submit" class="btn btn-primary w-100">التسجيل</button>
       </form>
       <div class="text-center mt-3">
-        <a href="http://localhost:8000/accounts/signin" class="text-decoration-none">هل لديك حساب؟ تسجيل الدخول</a>
+        <a href="{{ domain_name }}/accounts/signin" class="text-decoration-none">هل لديك حساب؟ تسجيل الدخول</a>
       </div>
     </div>
   </div>
@@ -74,7 +74,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JavaScript -->
   <script>
-    const BASE_URL = "http://localhost:8000/api/v1/accounts"; // رابط الـ API الخاص بك
+    const BASE_URL = "{{ domain_name }}/api/v1/accounts"; // رابط الـ API الخاص بك
 
     // تسجيل النموذج
     document.getElementById("register-form").addEventListener("submit", async (e) => {
