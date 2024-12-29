@@ -178,22 +178,22 @@ SPECTACULAR_SETTINGS = {
 
 # Celery settings
 from celery.schedules import crontab
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_BROKER_URL = f'redis://{env("REDIS_HOST")}:6379/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "rss_client.tasks.fetch_news_for_all_subscribers": {
         "task": "rss_client.tasks.fetch_news_for_all_subscribers",
-        "schedule": crontab(hour=20, minute=00),
+        "schedule": crontab(hour=18, minute=00),  # Run every day morning at 12:35 AM
     },
     "rss_client.tasks.summarize_feeds_by_day": {
         "task": "rss_client.tasks.summarize_feeds_by_day",
-        "schedule": crontab(hour=20, minute=5),
+        "schedule": crontab(hour=18, minute=5),  # Run every day morning at 12:40 AM
     },
     "rss_client.tasks.send_newsletter": {
         "task": "rss_client.tasks.send_newsletter",
-        "schedule": crontab(hour=20, minute=10),
+        "schedule": crontab(hour=18, minute=10),  # Run every day morning at 12:45 AM
     },
 }
 
