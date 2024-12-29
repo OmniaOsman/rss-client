@@ -9,3 +9,6 @@ python manage.py migrate
 # Run the original CMD or any other command you'd like
 python manage.py runserver 0.0.0.0:8000
 exec "$@"
+
+# load data from data seed file to database
+python3 manage.py loaddata 0001_category.json
