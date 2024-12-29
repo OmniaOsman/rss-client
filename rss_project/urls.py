@@ -21,7 +21,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     # Front-End urls
-    path('home/', include('accounts.urls'), name='home'),
+    path('', include('accounts.urls'), name='home'),
     path('accounts/', include('accounts.urls'), name='accounts'),
     # API urls
     path('api/v1/accounts/', include('accounts.urls'), name='accounts'),

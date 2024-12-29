@@ -10,10 +10,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="container py-4">
-
-    <div class="d-flex justify-content-end">
-        <button id="logout-button" class="btn btn-danger">تسجيل الخروج</button>
+<body class="container py-4" onload="checkAuth()">
+    <div class="d-flex justify-content-end align-items-center gap-3">
+        <button id="update-news-btn" class="btn btn-primary px-4">
+            <span id="btn-text">تحديث اﻷخبار</span>
+            <span id="loading-spinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+        </button>
+        <div id="update-status" class="text-success"></div>
+        <button id="logout-button" class="btn btn-danger px-4">تسجيل الخروج</button>
     </div>
 
     <!-- UID Block -->

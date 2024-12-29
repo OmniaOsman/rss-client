@@ -74,7 +74,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JavaScript -->
   <script>
-    const BASE_URL = "{{ domain_name }}/api/v1/accounts"; // رابط الـ API الخاص بك
+    const DOMAIN_NAME = window.location.origin;
+    const BASE_URL = `${DOMAIN_NAME}/api/v1/accounts`; // رابط الـ API الخاص بك
 
     // تسجيل النموذج
     document.getElementById("register-form").addEventListener("submit", async (e) => {
