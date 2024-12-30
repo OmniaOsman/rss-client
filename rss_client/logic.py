@@ -382,13 +382,13 @@ def summarize_feeds_by_day(data, request):
         channel,
         "atom:link",
         {
-            "href": "{domain_name}/api/v1/news/summary",
+            "href": f"{domain_name}/api/v1/news/summary",
             "rel": "self",
             "type": "application/rss+xml",
         },
     )
     ET.SubElement(channel, "title").text = "Summary of News"
-    ET.SubElement(channel, "link").text = "{domain_name}/api/v1/news/summary"
+    ET.SubElement(channel, "link").text = f"{domain_name}/api/v1/news/summary"
     ET.SubElement(channel, "managingEditor").text = "support@example.com (Support)"
     ET.SubElement(channel, "webMaster").text = "webmaster@example.com (Webmaster)"
     ET.SubElement(channel, "description").text = "Example Network RSS Feed"
