@@ -16,7 +16,23 @@
             <span id="btn-text">تحديث اﻷخبار</span>
             <span id="loading-spinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
         </button>
+        <button id="news-summary-btn" class="btn btn-info px-4">ملخص الأخبار</button>
         <div id="update-status" class="text-success"></div>
+        <div class="modal fade" id="newsSummaryModal" tabindex="-1" aria-labelledby="newsSummaryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newsSummaryModalLabel">ملخص الأخبار</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="news-list" class="list-group">
+                            <!-- News items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <button id="logout-button" class="btn btn-danger px-4">تسجيل الخروج</button>
     </div>
 

@@ -21,6 +21,7 @@ async function fetchUID() {
         const result = await response.json();
         if (response.ok) {
             document.getElementById('uid').textContent = result.payload;
+            localStorage.setItem('uid', result.payload);
         } else {
             console.error(result);
             alert('تعذر جلب UID');
@@ -77,7 +78,63 @@ document.getElementById('add-group-form').addEventListener('submit', async (e) =
         console.error('Error adding group:', error);
     }
 });
+document.getElementById('news-summary-btn').addEventListener('click', async () => {
+    const uid = localStorage.getItem('uid');
+    // print local storage
+    console.log(localStorage);
+    if (!uid) {
+        alert('لم يتم العثور على UID');
+        return;
+    }
 
+    try {
+        const response = await fetch(`${DOMAIN_NAME}/api/v1/news/summary/${uid}`, {
+            headers: {
+                'Authorization': `Token ${localStorage.getItem('token')}`
+            }
+        });
+
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+        const items = xmlDoc.getElementsByTagName('item');
+        
+        const newsList = document.getElementById('news-list');
+        newsList.innerHTML = ''; // Clear existing items
+
+        Array.from(items).forEach(item => {
+            const title = item.getElementsByTagName('title')[0]?.textContent || '';
+            let description = item.getElementsByTagName('description')[0]?.textContent || '';
+            const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
+            const link = item.getElementsByTagName('link')[0]?.textContent || '';
+
+            // Clean up CDATA and decode HTML entities in description
+            description = description.replace('<![CDATA[', '').replace(']]>', '');
+            description = new DOMParser().parseFromString(description, 'text/html').body.textContent;
+
+            const newsItem = document.createElement('div');
+            newsItem.className = 'list-group-item';
+            newsItem.innerHTML = `
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">${title}</h5>
+                    <small class="text-muted">${new Date(pubDate)} | ${new Date(pubDate).toLocaleDateString('ar-SA')}</small>
+                </div>
+                <p class="mb-1">${description}</p>
+                <small class="text-muted">
+                    <a href="${link}" target="_blank" class="text-decoration-none">اقرأ المزيد</a>
+                </small>
+            `;
+            newsList.appendChild(newsItem);
+        });
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('newsSummaryModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Error fetching news summary:', error);
+        alert('حدث خطأ أثناء جلب ملخص الأخبار');
+    }
+});
 // Render groups dynamically
 function addGroupToPage(group) {
     const groupBlock = document.createElement('div');
