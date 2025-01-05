@@ -185,15 +185,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     "rss_client.tasks.fetch_news_for_all_subscribers": {
         "task": "rss_client.tasks.fetch_news_for_all_subscribers",
-        "schedule": crontab(hour=18, minute=00),  # Run every day morning at 12:35 AM
+        "schedule": crontab(minute=0),  # Run every hour
     },
     "rss_client.tasks.summarize_feeds_by_day": {
         "task": "rss_client.tasks.summarize_feeds_by_day",
-        "schedule": crontab(hour=18, minute=5),  # Run every day morning at 12:40 AM
+        "schedule": crontab(hour=22, minute=30),  # Run every day morning at 10:30 PM
     },
     "rss_client.tasks.send_newsletter": {
         "task": "rss_client.tasks.send_newsletter",
-        "schedule": crontab(hour=18, minute=10),  # Run every day morning at 12:45 AM
+        "schedule": crontab(hour=18, minute=57),  # Run every day morning at 12:45 AM
     },
 }
 
