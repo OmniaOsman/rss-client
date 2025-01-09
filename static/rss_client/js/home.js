@@ -476,6 +476,8 @@ document.getElementById('logout-button').addEventListener('click', async () => {
         if (result.success) {
             alert('تم تسجيل الخروج بنجاح');
             window.location.href = `${DOMAIN_NAME}/accounts/signin`; // Redirect to sign-in page
+            // Clear token and other user data
+            localStorage.removeItem('token');
         } else {
             alert('فشل تسجيل الخروج');
         }

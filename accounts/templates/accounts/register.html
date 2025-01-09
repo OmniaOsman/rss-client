@@ -107,10 +107,11 @@
 
         if (response.ok) {
           alert("تم التسجيل بنجاح!");
+          // redirect to login page
+          window.location.href = `${DOMAIN_NAME}/accounts/signin`;
         } else {
           const errorData = await response.json();
           console.log(errorData);
-          
           alert(`خطأ: ${errorData.message}`);
         }
       } catch (error) {
