@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'groups',
     'feeds',
     'chat',
+    'reporter',
 ]
 
 MIDDLEWARE = [
@@ -193,6 +194,10 @@ CELERY_BEAT_SCHEDULE = {
     },
     "rss_client.tasks.send_newsletter": {
         "task": "rss_client.tasks.send_newsletter",
+        "schedule": crontab(hour=18, minute=57),  # Run every day morning at 12:45 AM
+    },
+        "reporter.tasks.report_summaries": {
+        "task": "reporter.tasks.report_summaries",
         "schedule": crontab(hour=18, minute=57),  # Run every day morning at 12:45 AM
     },
 }

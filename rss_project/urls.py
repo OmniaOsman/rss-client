@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/v1/feeds/', include('feeds.urls'), name='feeds'),
     path('api/v1/chat/', include('chat.urls'), name='chat'),
     path('api/v1/news/', include('rss_client.urls'), name='news'),
+    path('api/v1/reporter/', include('reporter.urls'), name='reporter'),
     path('admin/', admin.site.urls),
     # API documentation
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
