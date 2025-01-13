@@ -1,11 +1,7 @@
 from datetime import datetime
 from celery import shared_task
-from .models import ProcessedFeed, Feed, Subscriber
-from django.utils.html import strip_tags
-import ast
-from django.conf import settings
+from .models import ProcessedFeed, Subscriber
 from django.db.models import Prefetch
-from django.core.mail import send_mail
 from .hooks import report_to_publisher
 
 @shared_task
