@@ -1,6 +1,6 @@
 from datetime import datetime
 from celery import shared_task
-from .models import ProcessedFeed, Subscriber
+from rss_client.models import ProcessedFeed, Subscriber
 from django.db.models import Prefetch
 from .hooks import report_to_publisher
 
