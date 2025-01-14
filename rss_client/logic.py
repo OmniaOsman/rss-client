@@ -298,6 +298,22 @@ def fetch_news_from_rss(rss_url: str, limit: int, source_id: int, user_id: int =
 
     return entries
 
+def get_news_from_sources(user_id):
+    # Get sources associated with the user
+    sources = Source.objects.filter(user_id=user_id)
+    if not sources:
+        raise ValidationError("No sources found for this user")
+
+    # Get RSS URLs from the sources
+    rss_urls = {}
+    for source in sources:
+        rss_urls[source.name] = [source.url, source.id]
+    all_news = {}
+    limit = 25
+    for source, value in rss_urls.items():
+        news_entries = fetch_news_from_rss(value[0], limit, value[1], user_id)
+        all_news[source] = news_entries
+    return all_news
 
 def get_news_from_multiple_sources(data, request):
     """
@@ -321,26 +337,13 @@ def get_news_from_multiple_sources(data, request):
     user_id: int = request.user.id
 
     # Get sources associated with the user
-    sources = Source.objects.filter(user_id=user_id)
-    if not sources:
-        raise ValidationError("No sources found for this user")
-
-    # Get RSS URLs from the sources
-    rss_urls = {}
-    for source in sources:
-        rss_urls[source.name] = [source.url, source.id]
-    all_news = {}
-    limit = 25
-    for source, value in rss_urls.items():
-        news_entries = fetch_news_from_rss(value[0], limit, value[1], user_id)
-        all_news[source] = news_entries
+    all_news = get_news_from_sources(user_id)
 
     return {
         "success": True,
         "message": "News fetched successfully",
         "payload": all_news,
     }
-
 
 def get_tags():
     """Retrieve all unique tags collected.

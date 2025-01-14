@@ -8,6 +8,8 @@ from django.db.models import Prefetch
 from django.core.mail import send_mail
 from django.db.models import Prefetch
 from reporter.hooks import report_to_publisher
+from accounts.models import User
+
 
 @shared_task
 def fetch_news_for_all_subscribers():
@@ -19,13 +21,12 @@ def fetch_news_for_all_subscribers():
     and updates. This ensures that each subscriber has access to the most recent
     news content from various sources.
     """
-    from rss_client.logic import get_news_from_multiple_sources
-
+    from rss_client.logic import get_news_from_sources
     # get all the subscribers
-    subscribers = Subscriber.objects.all()
+    users = User.objects.all()
 
-    for subscriber in subscribers:
-        get_news_from_multiple_sources(data={}, request=subscriber)
+    for user in users:
+        get_news_from_sources(user.id)
 
 
 @shared_task
@@ -45,7 +46,7 @@ def summarize_feeds_by_day():
 
     After the task is complete, all the feeds created today are made inactive.
     """
-    from rss_client.logic import generate_summary, get_news_from_multiple_sources
+    from rss_client.logic import generate_summary, get_news_from_sources
 
     day_date = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d").date()
 
@@ -53,20 +54,14 @@ def summarize_feeds_by_day():
     feeds_queryset = Feed.objects.filter(created_at__date=day_date, active=True)
 
     # Prefetch active subscribers with their associated users and today's feeds
-    subscribers = (
-        Subscriber.objects.filter(is_active=True, user__isnull=False)
-        .prefetch_related(
-            Prefetch("user__feeds", queryset=feeds_queryset, to_attr="todays_feeds")
-        )
-        .select_related("user")
-    )
+    users = User.objects.all()
 
-    for subscriber in subscribers:
+    for user in users:
         # Use the prefetched feeds
-        feeds = subscriber.user.todays_feeds
+        feeds = user.feeds.filter(created_at__date=day_date, active=True)
 
         if not feeds:
-            get_news_from_multiple_sources(data={}, request=subscriber)
+            get_news_from_sources(user.id)
 
         titles = [feed.title for feed in feeds]
         descriptions = [feed.description for feed in feeds]
@@ -81,7 +76,7 @@ def summarize_feeds_by_day():
             title=result["title"],
             summary=result["summary"],
             created_at=datetime.now(),
-            user=subscriber.user,
+            user=user,
         )
 
         # make feeds inactive
@@ -118,7 +113,6 @@ def summarize_feeds(titles, descriptions, urls):
     )
 
     return result_tuple[0], result_tuple[1]
-
 
 @shared_task
 def send_newsletter():
@@ -192,9 +186,6 @@ def send_newsletter():
     except Exception as e:
         print(f"Error in sending newsletter: {e}")
         raise
-
-
-
 
 @shared_task
 def report_summaries():
