@@ -1,12 +1,7 @@
 from datetime import datetime
 from celery import shared_task
-from .models import ProcessedFeed, Feed, Subscriber
-from django.utils.html import strip_tags
+from .models import ProcessedFeed, Feed
 import ast
-from django.conf import settings
-from django.db.models import Prefetch
-from django.core.mail import send_mail
-from django.db.models import Prefetch
 from reporter.hooks import report_to_publisher
 from accounts.models import User
 
@@ -115,120 +110,34 @@ def summarize_feeds(titles, descriptions, urls):
     return result_tuple[0], result_tuple[1]
 
 @shared_task
-def send_newsletter():
-    try:
-        # Get today's date
-        today = datetime.now().date()
-
-        # Prefetch ProcessedFeeds for active subscribers
-        subscribers = (
-            Subscriber.objects.filter(is_active=True, user__isnull=False)
-            .select_related("user")
-            .prefetch_related(
-                Prefetch(
-                    "user__processed_feeds",
-                    queryset=ProcessedFeed.objects.filter(created_at__date=today),
-                    to_attr="todays_summaries",
-                )
-            )
-        )
-
-        for subscriber in subscribers:
-            if subscriber.user.email == "first_user@gmail.com":
-                continue
-            try:
-                # Use prefetched summaries
-                user_summaries = subscriber.user.todays_summaries
-
-                # Skip if no summaries for this user
-                if not user_summaries:
-                    print(f"No summaries for user {subscriber.user.email}")
-                    continue
-
-                # Get the first summary
-                summary = user_summaries[0]
-                title = summary.title
-                summary_text = summary.summary
-
-                # Create HTML content
-                html_content = f"""
-                <html>
-                    <head>
-                        <meta charset="utf-8">
-                    </head>
-                    <body dir="rtl" style="font-family: Arial, sans-serif;">
-                        <h2>مرحباً {subscriber.user.first_name},</h2>
-                        <h3>{title}</h3>
-                        <div>{summary_text}</div>
-                        <p>تحياتي,<br>RSS Client</p>
-                    </body>
-                </html>
-                """
-
-                # Create plain text content
-                text_content = strip_tags(html_content)
-
-                # Send the email using Django's send_mail
-                send_mail(
-                    subject="Newsletter of the day",
-                    message=text_content,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[subscriber.user.email],
-                    html_message=html_content,
-                )
-
-                print(f"Email sent to {subscriber.user.email}")
-
-            except Exception as e:
-                print(f"Error sending email to {subscriber.user.email}: {e}")
-                continue
-
-    except Exception as e:
-        print(f"Error in sending newsletter: {e}")
-        raise
-
-@shared_task
 def report_summaries():
     try:
         # Get today's date
         today = datetime.now().date()
-
-        # Prefetch ProcessedFeeds for active subscribers
-        subscribers = (
-            Subscriber.objects.filter(is_active=True, user__isnull=False)
-            .select_related("user")
-            .prefetch_related(
-                Prefetch(
-                    "user__processed_feeds",
-                    queryset=ProcessedFeed.objects.filter(created_at__date=today),
-                    to_attr="todays_summaries",
-                )
-            )
-        )
-
-        for subscriber in subscribers:
-       
+        # Prefetch active subscribers with their associated users and today's feeds
+        users = User.objects.all()
+        for user in users:
             try:
                 # Use prefetched summaries
-                user_summaries = subscriber.user.todays_summaries
-                user_publishers = subscriber.user.publishers
+                user_summaries = user.processed_feeds.filter(created_at__date=today)
+                user_publishers = user.publishers
                 # Skip if no summaries for this user
                 if not user_summaries:
-                    print(f"No summaries for user {subscriber.user.email}")
+                    print(f"No summaries for user {user.email}")
                     continue
                 if not user_publishers:
-                    print(f"No publishers for user {subscriber.user.email}")
+                    print(f"No publishers for user {user.email}")
                     continue
                 
                 for summary in user_summaries:
                     for publisher in user_publishers:
                         if report_to_publisher(publisher,summary):
-                            print(f"Published summary to {publisher.name} for {subscriber.user.email}")
+                            print(f"Published summary to {publisher.name} for {user.email}")
                         else:
-                            print(f"Failed to publish summary to {publisher.name} for {subscriber.user.email}")
+                            print(f"Failed to publish summary to {publisher.name} for {user.email}")
 
             except Exception as e:
-                print(f"Error sending email to {subscriber.user.email}: {e}")
+                print(f"Error sending email to {user.email}: {e}")
                 continue
 
     except Exception as e:

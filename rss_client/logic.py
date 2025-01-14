@@ -4,7 +4,7 @@ import openai
 from django.conf import settings
 from accounts.models import User
 from sources.models import Source
-from .models import Feed, Subscriber, Tag, ProcessedFeed, TagCategory
+from .models import Feed, Tag, ProcessedFeed, TagCategory
 from rest_framework.exceptions import ValidationError
 from datetime import datetime
 from .tasks import summarize_feeds
@@ -416,44 +416,6 @@ def summarize_feeds_by_day(data, request):
     # Convert the XML structure to a string
     rss_feed = ET.tostring(rss, encoding="unicode")
     return rss_feed
-
-
-def subscribe_to_newsletter(data, request):
-    """Subscribe to newsletter"""
-    user = request.user
-
-    # check if subscriber already exists
-    subscribe_obj = Subscriber.objects.filter(user=user)
-    if subscribe_obj.exists():
-        # update is_active to true
-        subscribe_obj.update(is_active=True, subscribed_at=datetime.now())
-    else:
-        Subscriber.objects.create(
-            user=user, is_active=True, subscribed_at=datetime.now()
-        )
-
-    return {
-        "success": True,
-        "message": "subscribed successfully",
-    }
-
-
-def unsubscribe_from_newsletter(data, request):
-    """Unsubscribe from newsletter"""
-    email = request.user.email
-
-    # get the user object
-    user = User.objects.filter(email=email).first()
-
-    # update is_active to false
-    Subscriber.objects.filter(user=user).update(
-        is_active=False, unsubscribed_at=datetime.now()
-    )
-
-    return {
-        "success": True,
-        "message": "unsubscribed successfully",
-    }
 
 
 def get_summary_by_id(data, request):

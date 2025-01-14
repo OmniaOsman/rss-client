@@ -5,6 +5,4 @@ from .models import *
 admin.site.register(Feed)
 admin.site.register(ProcessedFeed)
 admin.site.register(Tag)
-admin.site.register(Report) 
-admin.site.register(Subscriber)
 admin.site.register(TagCategory)

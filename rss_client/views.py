@@ -64,23 +64,3 @@ class SummaryAPI(ModelViewSet):
         return HttpResponse(response, status=status.HTTP_200_OK)
 
 
-class SubscribeAPI(APIView):
-    @extend_schema(responses=SubscribeResponseSerializer)
-    def post(self, request):
-        return process_request(
-            None,
-            SubscribeResponseSerializer,
-            subscribe_to_newsletter,
-            request,
-        )
-
-    @extend_schema(
-        responses=UnsubscribeResponseSerializer
-    )
-    def put(self, request):
-        return process_request(
-            None,
-            UnsubscribeResponseSerializer,
-            unsubscribe_from_newsletter,
-            request,
-        )

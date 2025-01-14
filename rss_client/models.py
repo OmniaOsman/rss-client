@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import User
 import re
-
+from pgvector.django import VectorField,HnswIndex
 from sources.models import Source
 
 
@@ -97,6 +97,8 @@ class Feed(models.Model):
         help_text="source associated with the feed",
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    #feed embedding
+    embedding = VectorField(dimensions=1536)
 
     def __str__(self):
         return self.title
@@ -105,6 +107,13 @@ class Feed(models.Model):
         unique_together = ("user", "url", "external_id")
         indexes = [
             models.Index(fields=["user", "url"], name="user_url_index"),
+            HnswIndex(
+                    name="embedding_vectors_index",
+                    fields=["embedding"],
+                    m=16,
+                    ef_construction=64,
+                    opclasses=["vector_cosine_ops"],
+                ),
         ]
 
 
@@ -124,25 +133,4 @@ class ProcessedFeed(models.Model):
         return self.title
 
 
-class Report(models.Model):
-    summary = models.TextField(help_text="report summary")
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return str(self.created_at)
-
-
-class Subscriber(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        related_name="subscribers",
-        null=True,
-        help_text="user associated with the subscriber",
-    )
-    is_active = models.BooleanField(default=True)
-    subscribed_at = models.DateTimeField(auto_now_add=True)
-    unsubscribed_at = models.DateTimeField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.user.first_name} {self.user}, ID {self.user.id}"

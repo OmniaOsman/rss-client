@@ -6,5 +6,4 @@ urlpatterns = [
     path('tags', views.TagsList.as_view(), name='tags'),
     path('summary/<int:summary_id>', views.SummaryAPI.as_view({'get': 'retrieve'}), name='summary'),
     path('summary/<str:uid>', views.SummaryAPI.as_view({'get': 'list'}), name='summary'),
-    path('subscribe', views.SubscribeAPI.as_view(), name='subscribe'),
 ]
