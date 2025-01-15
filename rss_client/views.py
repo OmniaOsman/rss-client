@@ -5,8 +5,6 @@ from rss_client.logic import (
     get_news_from_multiple_sources,
     get_tags,
     summarize_feeds_by_day,
-    subscribe_to_newsletter,
-    unsubscribe_from_newsletter,
     get_summary_by_id,
 )
 from rest_framework import status
@@ -15,8 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 from rss_project.utils import process_request
 from .serializers import (
     FeedResponseSerializer,
-    UnsubscribeResponseSerializer,
-    SubscribeResponseSerializer,
     SummaryRequestSerializer,
     SummaryByIDRequestSerializer,
 )

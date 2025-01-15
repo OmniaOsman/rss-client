@@ -11,7 +11,7 @@ from .tasks import summarize_feeds
 import json
 from django.db.models import Q
 from xml.etree import ElementTree as ET
-
+from chat.logic import get_embeddings
 
 tags = []
 openai.api_key = settings.OPENAI_API_KEY
@@ -189,7 +189,71 @@ def generate_tags_for_all_entries(entries):
     }
     return all_tags_data
 
+def generate_embedding_for_all_feed(entries):
+    """Generate embeddings for each RSS entry."""
+    all_embeddings_data = {}
+    for entry in entries:
+        text = f"""{entry['title']} 
+        {entry.get('summary', '')}
+        """
+        embeddings = get_embeddings(text)
+        all_embeddings_data[entry["id"]] = embeddings
+    return all_embeddings_data
+   
+def get_news_from_rss_v2(rss_url: str, limit: int, source_id: int, user_id: int = None):
+    """
+    Fetches news from an RSS feed and stores them in the database.
 
+    :param rss_url: The URL of the RSS feed
+    :param limit: The maximum number of news entries to fetch
+    :param user_id: The ID of the user to associate with the news entries
+    :return: A list of news entries, without duplicates, and with tags associated
+    """
+    feed = feedparser.parse(rss_url)
+    entries = feed.entries[:limit]
+    # Fetch existing feeds
+    existing_feeds = get_existing_feeds(entries, user_id)
+
+    # Generate tags for all entries
+    all_tags_data = generate_embedding_for_all_feed(entries)
+    # Prepare new feeds and tags
+    new_feeds = []
+    for entry in entries:
+        if entry["id"] not in existing_feeds:
+            new_feed = Feed(
+                external_id=entry["id"],
+                title=entry["title"],
+                url=entry["link"],
+                description=entry.get("summary", ""),
+                embedding=all_tags_data[entry["id"]],
+                active=True,
+                user_id=user_id,
+                source_id=source_id,
+            )
+            new_feeds.append(new_feed)
+
+    # Bulk create feeds and feed-tag relationships
+    if new_feeds:
+        Feed.objects.bulk_create(new_feeds)
+    return entries
+
+def get_news_from_sources(user_id):
+    # Get sources associated with the user
+    sources = Source.objects.filter(user_id=user_id)
+    if not sources:
+        raise ValidationError("No sources found for this user")
+
+    # Get RSS URLs from the sources
+    rss_urls = {}
+    for source in sources:
+        rss_urls[source.name] = [source.url, source.id]
+    all_news = {}
+    limit = 25
+    for source, value in rss_urls.items():
+        news_entries = fetch_news_from_rss(value[0], limit, value[1], user_id)
+        all_news[source] = news_entries
+    return all_news
+    
 def fetch_news_from_rss(rss_url: str, limit: int, source_id: int, user_id: int = None):
     """
     Fetches news from an RSS feed and stores them in the database.
@@ -311,7 +375,7 @@ def get_news_from_sources(user_id):
     all_news = {}
     limit = 25
     for source, value in rss_urls.items():
-        news_entries = fetch_news_from_rss(value[0], limit, value[1], user_id)
+        news_entries = get_news_from_rss_v2(value[0], limit, value[1], user_id)
         all_news[source] = news_entries
     return all_news
 

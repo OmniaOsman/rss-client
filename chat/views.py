@@ -1,7 +1,7 @@
 from .serializers import AskQuestionRequest, AskQuestionResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .logic import ask_question
+from .logic import ask_question_v2
 from rss_project.utils import process_request
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
@@ -15,7 +15,7 @@ class ChatAPI(APIView):
         return process_request(
             AskQuestionRequest, 
             AskQuestionResponse, 
-            ask_question, 
+            ask_question_v2, 
             request
         )
 

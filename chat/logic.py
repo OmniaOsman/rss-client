@@ -4,7 +4,9 @@ from chat.models import UserQuery
 import openai
 from rapidfuzz import process, fuzz
 import json
-
+from django.conf import settings
+import openai
+from pgvector.django import CosineDistance
 
 # def test_internationalization():
 # it is used to test the internationalization
@@ -27,6 +29,48 @@ def get_similar_tags(tags):
         similar_tags.update(matched_tags)
 
     return list(similar_tags)
+
+def get_best_matched_feeds(question,user_id, date_range_start=None, date_range_end=None, k=10):
+    embedding = get_embeddings(question)
+    feeds_query = {}
+    if date_range_start:
+        feeds_query["created_at__date__gte"] = date_range_start
+    if date_range_end:
+        feeds_query["created_at__date__lte"] = date_range_end
+    
+    objects =Feed.objects.filter(user_id=user_id).annotate(distance=CosineDistance("embedding", embedding)).order_by("distance")
+    if objects.count() < 1:
+        return None
+    if objects.count() < k:
+        return objects
+    return objects[:k]
+
+
+    
+    
+def get_embeddings(text):
+    """
+    Generate embeddings for a given text using the OpenAI API.
+
+    This function utilizes the OpenAI API to generate embeddings for a given text.
+    The embeddings are returned as a list of floats.
+
+    Args:
+        text (str): The text for which embeddings are to be generated.
+
+    Returns:
+        list: A list of floats representing the embeddings for the given text.
+    """
+    model= settings.OPENAI_EMBEDDING_MODEL
+    base_url = settings.OPENAI_API_BASE_URL
+    api_key = settings.OPENAI_API_KEY
+    openai.api_key = api_key
+    openai.api_base = base_url
+    response = openai.Embed.create(model=model, objects=[{"text": text}])
+    if "error" in response:
+        raise Exception(response["error"]["message"])
+    embeddings = response["embedding"]
+    return embeddings
 
 
 def extrat_tags_from_question(question):
@@ -101,9 +145,7 @@ def generate_response(feeds_titles, feeds_descriptions, feeds_urls, question):
     Returns:
         str: The generated response.
     """
-    titles_str = "\n".join(feeds_titles)
-    descriptions_str = "\n".join(feeds_descriptions)
-    urls_str = "\n".join(feeds_urls)
+
     context_str = ""
     for i, feed in enumerate(list(zip(feeds_titles, feeds_descriptions, feeds_urls))):
         context_str += f"""
@@ -173,7 +215,63 @@ def generate_response(feeds_titles, feeds_descriptions, feeds_urls, question):
         cleaned_response += f"[{i+1}] {feeds_urls[n-1]} \n"
     return cleaned_response
 
+def ask_question_v2(data: dict, request):
+    """
+    Process a question to generate a response based on related feeds and tags.
 
+    This function extracts tags from the question, retrieves relevant feeds
+    based on the tags and optional date range, and uses the OpenAI API to
+    generate a response in Arabic. The response is saved to the database along
+    with the question and associated tags.
+
+    Args:
+        data (dict): Input data containing the question and optional date range.
+            - 'question' (str): The question to be processed.
+            - 'date_range_start' (str, optional): The start date for filtering feeds.
+            - 'date_range_end' (str, optional): The end date for filtering feeds.
+        request: The HTTP request object containing user information.
+
+    Returns:
+        dict: A dictionary containing the success status, a message, and the generated response.
+            - 'success' (bool): Indicates if the operation was successful.
+            - 'message' (str): A message indicating the result of the operation.
+            - 'payload' (str): The generated response or an error message if no feeds were found.
+    """
+    question: str = data["question"]
+    date_range_start: str = data.get("date_range_start")
+    date_range_end: str = data.get("date_range_end")
+    user_id = request.user.id
+    feeds = get_best_matched_feeds(question,user_id, date_range_start, date_range_end)
+    if not feeds:
+        return {
+            "success": False,
+            "message": "Be more specific, your question is not related to any feed or no feeds found in this date range",
+            "payload": "Be more specific, your question is not related to any feed or no feeds found in this date range",
+        }
+
+    # Send this feeds as a context to GPT
+    feeds_titles = list(feeds.values_list("title", flat=True))
+    feeds_descriptions = list(feeds.values_list("description", flat=True))
+    feeds_urls = list(feeds.values_list("url", flat=True))
+    print(feeds_titles)
+
+    # Generate response from GPT
+    response = generate_response(feeds_titles, feeds_descriptions, feeds_urls, question)
+
+    # Save the response to the database
+    UserQuery.objects.create(
+        user=request.user,
+        question=question,
+        answer=response,
+        date_range_start=date_range_start,
+        date_range_end=date_range_end,
+    )
+    
+    return {
+        "success": True,
+        "message": "Feeds fetched successfully",
+        "payload": response,
+    }
 def ask_question(data: dict, request):
     """
     Process a question to generate a response based on related feeds and tags.
