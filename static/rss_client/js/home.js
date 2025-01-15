@@ -417,51 +417,7 @@ document.getElementById('add-source-form').addEventListener('submit', async (e) 
     }
 });
 
-// Newsletter Subscription
-// Handle subscription with Yes/No buttons
-document.getElementById('yes-btn').addEventListener('click', async () => {
-    try {
-        const response = await fetch(`${DOMAIN_NAME}/api/v1/news/subscribe`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            },
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            alert('تم الاشتراك في النشرة الإخبارية بنجاح');
-        } else {
-            alert(result.message);
-        }
-    } catch (error) {
-        console.error('Error subscribing to newsletter:', error);
-    }
-});
-
-document.getElementById('no-btn').addEventListener('click', async () => {
-    try {
-        const response = await fetch(`${DOMAIN_NAME}/api/v1/news/subscribe`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            },
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            alert('تم إلغاء الاشتراك في النشرة الإخبارية بنجاح');
-        } else {
-            alert(result.message);
-        }
-    } catch (error) {
-        console.error('Error unsubscribing from newsletter:', error);
-    }
-});
-
-
+// Handle logout
 document.getElementById('logout-button').addEventListener('click', async () => {
     try {
         const response = await fetch(`${DOMAIN_NAME}/api/v1/accounts/logout`, {
