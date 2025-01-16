@@ -35,20 +35,11 @@ from sources.models import Source
 
 class TagCategory(models.Model):
     name = models.CharField(max_length=100, unique=True, help_text="tag category name")
-    # slug = models.SlugField(max_length=100, unique=True, help_text='tag category slug')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = arabic_slugify(self.name)
-    #     super().save(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
 class Tag(models.Model):
     name = models.CharField(max_length=100, help_text="tag name")
-    # slug = models.SlugField(max_length=100, unique=True, help_text='tag slug')
     category = models.ForeignKey(
         TagCategory,
         on_delete=models.SET_NULL,
@@ -56,13 +47,6 @@ class Tag(models.Model):
         null=True,
         help_text="tag category",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = arabic_slugify(self.name)
-    #     super().save(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
