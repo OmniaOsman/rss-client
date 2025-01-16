@@ -4,10 +4,9 @@ import openai
 from django.conf import settings
 from accounts.models import User
 from sources.models import Source
-from .models import Feed, Tag, ProcessedFeed, TagCategory, Category, SubCategory
+from .models import Feed, Tag, ProcessedFeed, TagCategory
 from rest_framework.exceptions import ValidationError
 from datetime import datetime
-from .tasks import summarize_feeds
 import json
 from django.db.models import Q
 from xml.etree import ElementTree as ET
@@ -259,7 +258,7 @@ def get_news_from_rss_v2(rss_url: str, limit: int, source_id: int, user_id: int 
     """
     feed = feedparser.parse(rss_url)
     entries = feed.entries[:limit]
-    categories = Category.objects.all().prefetch_related("tags")
+    categories = TagCategory.objects.all().prefetch_related("tags")
     # Fetch existing feeds
     existing_feeds = get_existing_feeds(entries, user_id)
 
