@@ -58,8 +58,13 @@ def send_discord_message(publisher,article):
     if not publisher.parameters.get('webhook_url'):
         raise ValueError('Webhook URL is required')
     #send the message
-    response = post(publisher.parameters['webhook_url'], json={'content': article.title})
+    content = f"""
+    # {article.title}
+    {article.summary}
+    """
+    response = post(publisher.parameters['webhook_url'], json={'content': content})
     if response.status_code != 200:
+        print(f"Failed to send message to Discord: {response.text}")
         return False
     return True
     

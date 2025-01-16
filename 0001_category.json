@@ -1,34 +1,1636 @@
-[
-{
-  "model": "rss_client.tagcategory",
-  "pk": 1,
-  "fields": {
-    "name": "تصنيف عام",
-    "created_at": "2024-11-24T16:34:01.880Z"
+ [
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 1,
+      "fields": {
+          "name": "News and Current Events"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 2,
+      "fields": {
+          "name": "Technology"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 3,
+      "fields": {
+          "name": "Business and Finance"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 4,
+      "fields": {
+          "name": "Science"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 5,
+      "fields": {
+          "name": "Arts and Culture"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 6,
+      "fields": {
+          "name": "Entertainment"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 7,
+      "fields": {
+          "name": "Lifestyle"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 8,
+      "fields": {
+          "name": "Sports"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 9,
+      "fields": {
+          "name": "Education"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 10,
+      "fields": {
+          "name": "Technology for Professionals"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 11,
+      "fields": {
+          "name": "Gaming"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 12,
+      "fields": {
+          "name": "Hobbies"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 13,
+      "fields": {
+          "name": "Automotive"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 14,
+      "fields": {
+          "name": "Health and Medicine"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 15,
+      "fields": {
+          "name": "Environment and Sustainability"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 16,
+      "fields": {
+          "name": "Religion and Spirituality"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 17,
+      "fields": {
+          "name": "Podcasts and Audio"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 18,
+      "fields": {
+          "name": "Video and Media Production"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 19,
+      "fields": {
+          "name": "Social Media and Marketing"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 20,
+      "fields": {
+          "name": "Career and Productivity"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 21,
+      "fields": {
+          "name": "Law and Government"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 22,
+      "fields": {
+          "name": "History"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 23,
+      "fields": {
+          "name": "Books and Literature"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 24,
+      "fields": {
+          "name": "Travel"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 25,
+      "fields": {
+          "name": "Food and Drink"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 26,
+      "fields": {
+          "name": "DIY and Home Improvement"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 27,
+      "fields": {
+          "name": "Pets and Animals"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 28,
+      "fields": {
+          "name": "Science Fiction and Fantasy"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 29,
+      "fields": {
+          "name": "Humor and Memes"
+      }
+  },
+  {
+      "model": "rss_client.tagcategory",
+      "pk": 30,
+      "fields": {
+          "name": "Miscellaneous"
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 1,
+      "fields": {
+          "name": "World News",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 2,
+      "fields": {
+          "name": "Local News",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 3,
+      "fields": {
+          "name": "Politics",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 4,
+      "fields": {
+          "name": "Business News",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 5,
+      "fields": {
+          "name": "Technology News",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 6,
+      "fields": {
+          "name": "Science News",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 7,
+      "fields": {
+          "name": "Entertainment News",
+          "category_id": 1
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 8,
+      "fields": {
+          "name": "Gadgets and Reviews",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 9,
+      "fields": {
+          "name": "Software and Apps",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 10,
+      "fields": {
+          "name": "Programming and Development",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 11,
+      "fields": {
+          "name": "AI and Machine Learning",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 12,
+      "fields": {
+          "name": "Cybersecurity",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 13,
+      "fields": {
+          "name": "Blockchain and Cryptocurrencies",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 14,
+      "fields": {
+          "name": "Tech Industry",
+          "category_id": 2
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 15,
+      "fields": {
+          "name": "Economy",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 16,
+      "fields": {
+          "name": "Stock Market",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 17,
+      "fields": {
+          "name": "Startups",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 18,
+      "fields": {
+          "name": "Investing and Trading",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 19,
+      "fields": {
+          "name": "Personal Finance",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 20,
+      "fields": {
+          "name": "Real Estate",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 21,
+      "fields": {
+          "name": "Entrepreneurship",
+          "category_id": 3
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 22,
+      "fields": {
+          "name": "Biology",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 23,
+      "fields": {
+          "name": "Physics",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 24,
+      "fields": {
+          "name": "Chemistry",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 25,
+      "fields": {
+          "name": "Astronomy",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 26,
+      "fields": {
+          "name": "Environmental Science",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 27,
+      "fields": {
+          "name": "Research and Innovations",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 28,
+      "fields": {
+          "name": "Space Exploration",
+          "category_id": 4
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 29,
+      "fields": {
+          "name": "Literature",
+          "category_id": 5
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 30,
+      "fields": {
+          "name": "Visual Arts",
+          "category_id": 5
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 31,
+      "fields": {
+          "name": "Performing Arts",
+          "category_id": 5
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 32,
+      "fields": {
+          "name": "Design",
+          "category_id": 5
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 33,
+      "fields": {
+          "name": "Photography",
+          "category_id": 5
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 34,
+      "fields": {
+          "name": "Museums and Exhibitions",
+          "category_id": 5
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 35,
+      "fields": {
+          "name": "Movies",
+          "category_id": 6
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 36,
+      "fields": {
+          "name": "TV Shows",
+          "category_id": 6
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 37,
+      "fields": {
+          "name": "Music",
+          "category_id": 6
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 38,
+      "fields": {
+          "name": "Celebrity News",
+          "category_id": 6
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 39,
+      "fields": {
+          "name": "Streaming Platforms",
+          "category_id": 6
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 40,
+      "fields": {
+          "name": "Awards and Festivals",
+          "category_id": 6
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 41,
+      "fields": {
+          "name": "Travel",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 42,
+      "fields": {
+          "name": "Food and Drink",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 43,
+      "fields": {
+          "name": "Fashion and Beauty",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 44,
+      "fields": {
+          "name": "Health and Wellness",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 45,
+      "fields": {
+          "name": "Home and Decor",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 46,
+      "fields": {
+          "name": "Relationships",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 47,
+      "fields": {
+          "name": "Parenting",
+          "category_id": 7
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 48,
+      "fields": {
+          "name": "Soccer",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 49,
+      "fields": {
+          "name": "Basketball",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 50,
+      "fields": {
+          "name": "Cricket",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 51,
+      "fields": {
+          "name": "Tennis",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 52,
+      "fields": {
+          "name": "Motorsports",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 53,
+      "fields": {
+          "name": "Olympics",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 54,
+      "fields": {
+          "name": "eSports",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 55,
+      "fields": {
+          "name": "Gaming",
+          "category_id": 8
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 56,
+      "fields": {
+          "name": "Online Courses",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 57,
+      "fields": {
+          "name": "Higher Education",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 58,
+      "fields": {
+          "name": "K-12 Education",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 59,
+      "fields": {
+          "name": "Study Tips",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 60,
+      "fields": {
+          "name": "EdTech",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 61,
+      "fields": {
+          "name": "Language Learning",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 62,
+      "fields": {
+          "name": "Education Policy",
+          "category_id": 9
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 63,
+      "fields": {
+          "name": "IT Management",
+          "category_id": 10
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 64,
+      "fields": {
+          "name": "Cloud Computing",
+          "category_id": 10
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 65,
+      "fields": {
+          "name": "Big Data",
+          "category_id": 10
+      }
+  },
+  {
+      "model": "rss_client.tag",
+      "pk": 66,
+      "fields": {
+          "name": "Networking",
+          "category_id": 10
+      }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 67,
+    "fields": {
+      "name": "Project Management",
+      "category_id": 10
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 68,
+    "fields": {
+      "name": "Game News",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 69,
+    "fields": {
+      "name": "Reviews and Guides",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 70,
+    "fields": {
+      "name": "Console Gaming",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 71,
+    "fields": {
+      "name": "PC Gaming",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 72,
+    "fields": {
+      "name": "Mobile Gaming",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 73,
+    "fields": {
+      "name": "Virtual Reality (VR)",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 74,
+    "fields": {
+      "name": "Game Development",
+      "category_id": 11
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 75,
+    "fields": {
+      "name": "Photography",
+      "category_id": 12
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 76,
+    "fields": {
+      "name": "DIY Projects",
+      "category_id": 12
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 77,
+    "fields": {
+      "name": "Gardening",
+      "category_id": 12
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 78,
+    "fields": {
+      "name": "Collecting",
+      "category_id": 12
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 79,
+    "fields": {
+      "name": "Writing and Blogging",
+      "category_id": 12
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 80,
+    "fields": {
+      "name": "Crafts and Art",
+      "category_id": 12
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 81,
+    "fields": {
+      "name": "Car News and Reviews",
+      "category_id": 13
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 82,
+    "fields": {
+      "name": "Electric Vehicles (EVs)",
+      "category_id": 13
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 83,
+    "fields": {
+      "name": "Motorsports",
+      "category_id": 13
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 84,
+    "fields": {
+      "name": "Auto Repair and Maintenance",
+      "category_id": 13
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 85,
+    "fields": {
+      "name": "Classic Cars",
+      "category_id": 13
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 86,
+    "fields": {
+      "name": "Industry Trends",
+      "category_id": 13
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 87,
+    "fields": {
+      "name": "Medical News",
+      "category_id": 14
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 88,
+    "fields": {
+      "name": "Mental Health",
+      "category_id": 14
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 89,
+    "fields": {
+      "name": "Fitness and Exercise",
+      "category_id": 14
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 90,
+    "fields": {
+      "name": "Nutrition and Diet",
+      "category_id": 14
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 91,
+    "fields": {
+      "name": "Diseases and Conditions",
+      "category_id": 14
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 92,
+    "fields": {
+      "name": "Alternative Medicine",
+      "category_id": 14
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 93,
+    "fields": {
+      "name": "Climate Change",
+      "category_id": 15
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 94,
+    "fields": {
+      "name": "Renewable Energy",
+      "category_id": 15
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 95,
+    "fields": {
+      "name": "Conservation",
+      "category_id": 15
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 96,
+    "fields": {
+      "name": "Recycling",
+      "category_id": 15
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 97,
+    "fields": {
+      "name": "Environmental Activism",
+      "category_id": 15
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 98,
+    "fields": {
+      "name": "Wildlife",
+      "category_id": 15
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 99,
+    "fields": {
+      "name": "Christianity",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 100,
+    "fields": {
+      "name": "Islam",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 101,
+    "fields": {
+      "name": "Buddhism",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 102,
+    "fields": {
+      "name": "Judaism",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 103,
+    "fields": {
+      "name": "Hinduism",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 104,
+    "fields": {
+      "name": "Atheism and Secularism",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 105,
+    "fields": {
+      "name": "Meditation and Mindfulness",
+      "category_id": 16
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 106,
+    "fields": {
+      "name": "Podcast Recommendations",
+      "category_id": 17
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 107,
+    "fields": {
+      "name": "Audiobooks",
+      "category_id": 17
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 108,
+    "fields": {
+      "name": "Industry News",
+      "category_id": 17
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 109,
+    "fields": {
+      "name": "Podcast Production Tips",
+      "category_id": 17
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 110,
+    "fields": {
+      "name": "Interviews and Conversations",
+      "category_id": 17
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 111,
+    "fields": {
+      "name": "Video Editing",
+      "category_id": 18
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 112,
+    "fields": {
+      "name": "Content Creation",
+      "category_id": 18
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 113,
+    "fields": {
+      "name": "Streaming Tips",
+      "category_id": 18
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 114,
+    "fields": {
+      "name": "YouTube and Social Media Video",
+      "category_id": 18
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 115,
+    "fields": {
+      "name": "Film Production",
+      "category_id": 18
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 116,
+    "fields": {
+      "name": "Social Media Trends",
+      "category_id": 19
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 117,
+    "fields": {
+      "name": "Digital Marketing",
+      "category_id": 19
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 118,
+    "fields": {
+      "name": "SEO and Content Marketing",
+      "category_id": 19
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 119,
+    "fields": {
+      "name": "Influencer Marketing",
+      "category_id": 19
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 120,
+    "fields": {
+      "name": "Email Marketing",
+      "category_id": 19
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 121,
+    "fields": {
+      "name": "Advertising Strategies",
+      "category_id": 19
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 122,
+    "fields": {
+      "name": "Job Market Trends",
+      "category_id": 20
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 123,
+    "fields": {
+      "name": "Career Advice",
+      "category_id": 20
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 124,
+    "fields": {
+      "name": "Freelancing",
+      "category_id": 20
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 125,
+    "fields": {
+      "name": "Productivity Hacks",
+      "category_id": 20
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 126,
+    "fields": {
+      "name": "Leadership and Management",
+      "category_id": 20
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 127,
+    "fields": {
+      "name": "Work-Life Balance",
+      "category_id": 20
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 128,
+    "fields": {
+      "name": "Legal News",
+      "category_id": 21
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 129,
+    "fields": {
+      "name": "Policies and Legislation",
+      "category_id": 21
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 130,
+    "fields": {
+      "name": "International Relations",
+      "category_id": 21
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 131,
+    "fields": {
+      "name": "Crime and Justice",
+      "category_id": 21
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 132,
+    "fields": {
+      "name": "Human Rights",
+      "category_id": 21
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 133,
+    "fields": {
+      "name": "Ancient Civilizations",
+      "category_id": 22
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 134,
+    "fields": {
+      "name": "Historical Events",
+      "category_id": 22
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 135,
+    "fields": {
+      "name": "Military History",
+      "category_id": 22
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 136,
+    "fields": {
+      "name": "Biographies",
+      "category_id": 22
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 137,
+    "fields": {
+      "name": "Historical Research",
+      "category_id": 22
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 138,
+    "fields": {
+      "name": "Book Reviews",
+      "category_id": 23
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 139,
+    "fields": {
+      "name": "New Releases",
+      "category_id": 23
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 140,
+    "fields": {
+      "name": "Genres",
+      "category_id": 23
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 141,
+    "fields": {
+      "name": "Writing Tips",
+      "category_id": 23
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 142,
+    "fields": {
+      "name": "Author Interviews",
+      "category_id": 23
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 143,
+    "fields": {
+      "name": "Destinations",
+      "category_id": 24
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 144,
+    "fields": {
+      "name": "Travel Tips",
+      "category_id": 24
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 145,
+    "fields": {
+      "name": "Travel Gear",
+      "category_id": 24
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 146,
+    "fields": {
+      "name": "Cultural Experiences",
+      "category_id": 24
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 147,
+    "fields": {
+      "name": "Budget Travel",
+      "category_id": 24
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 148,
+    "fields": {
+      "name": "Luxury Travel",
+      "category_id": 24
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 149,
+    "fields": {
+      "name": "Recipes",
+      "category_id": 25
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 150,
+    "fields": {
+      "name": "Restaurant Reviews",
+      "category_id": 25
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 151,
+    "fields": {
+      "name": "Beverages",
+      "category_id": 25
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 152,
+    "fields": {
+      "name": "Baking",
+      "category_id": 25
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 153,
+    "fields": {
+      "name": "Food Trends",
+      "category_id": 25
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 154,
+    "fields": {
+      "name": "Nutrition",
+      "category_id": 25
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 155,
+    "fields": {
+      "name": "Home Renovation",
+      "category_id": 26
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 156,
+    "fields": {
+      "name": "Interior Design",
+      "category_id": 26
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 157,
+    "fields": {
+      "name": "Crafts and Projects",
+      "category_id": 26
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 158,
+    "fields": {
+      "name": "Tools and Techniques",
+      "category_id": 26
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 159,
+    "fields": {
+      "name": "Landscaping",
+      "category_id": 26
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 160,
+    "fields": {
+      "name": "Pet Care",
+      "category_id": 27
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 161,
+    "fields": {
+      "name": "Animal News",
+      "category_id": 27
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 162,
+    "fields": {
+      "name": "Wildlife Conservation",
+      "category_id": 27
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 163,
+    "fields": {
+      "name": "Exotic Pets",
+      "category_id": 27
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 164,
+    "fields": {
+      "name": "Training Tips",
+      "category_id": 27
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 165,
+    "fields": {
+      "name": "Science Fiction Books",
+      "category_id": 28
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 166,
+    "fields": {
+      "name": "Fantasy Books",
+      "category_id": 28
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 167,
+    "fields": {
+      "name": "Movies",
+      "category_id": 28
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 168,
+    "fields": {
+      "name": "TV Shows",
+      "category_id": 28
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 169,
+    "fields": {
+      "name": "Fan Communities",
+      "category_id": 28
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 170,
+    "fields": {
+      "name": "Worldbuilding",
+      "category_id": 28
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 171,
+    "fields": {
+      "name": "Comedy",
+      "category_id": 29
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 172,
+    "fields": {
+      "name": "Satire",
+      "category_id": 29
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 173,
+    "fields": {
+      "name": "Internet Memes",
+      "category_id": 29
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 174,
+    "fields": {
+      "name": "Funny Videos",
+      "category_id": 29
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 175,
+    "fields": {
+      "name": "Unexplained Phenomena",
+      "category_id": 30
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 176,
+    "fields": {
+      "name": "Fun Facts",
+      "category_id": 30
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 177,
+    "fields": {
+      "name": "Odd News",
+      "category_id": 30
+    }
+  },
+  {
+    "model": "rss_client.tag",
+    "pk": 178,
+    "fields": {
+      "name": "Life Hacks",
+      "category_id": 30
+    }
   }
-},
-{
-  "model": "rss_client.tagcategory",
-  "pk": 2,
-  "fields": {
-    "name": "أماكن",
-    "created_at": "2024-11-24T16:34:24.927Z"
-  }
-},
-{
-  "model": "rss_client.tagcategory",
-  "pk": 3,
-  "fields": {
-    "name": "أشخاص",
-    "created_at": "2024-11-25T07:32:37.451Z"
-  }
-},
-{
-  "model": "rss_client.tagcategory",
-  "pk": 4,
-  "fields": {
-    "name": "أحداث",
-    "created_at": "2024-11-25T07:33:56.222Z"
-  }
-}
 ]

@@ -46,7 +46,6 @@ class TagCategory(models.Model):
     def __str__(self):
         return self.name
 
-
 class Tag(models.Model):
     name = models.CharField(max_length=100, help_text="tag name")
     # slug = models.SlugField(max_length=100, unique=True, help_text='tag slug')
@@ -120,6 +119,7 @@ class Feed(models.Model):
 class ProcessedFeed(models.Model):
     title = models.CharField(max_length=500, help_text="processed feed title")
     summary = models.TextField(help_text="processed feed summary")
+    references = models.JSONField(help_text="processed feed references")
     user = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,

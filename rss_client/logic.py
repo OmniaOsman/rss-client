@@ -4,7 +4,7 @@ import openai
 from django.conf import settings
 from accounts.models import User
 from sources.models import Source
-from .models import Feed, Tag, ProcessedFeed, TagCategory
+from .models import Feed, Tag, ProcessedFeed, TagCategory, Category, SubCategory
 from rest_framework.exceptions import ValidationError
 from datetime import datetime
 from .tasks import summarize_feeds
@@ -17,7 +17,74 @@ tags = []
 openai.api_key = settings.OPENAI_API_KEY
 domain_name = settings.DOMAIN_NAME
 
+def categorize_feed(feed,categories = []):
+    """
+    Categorize a feed based on the provided categories.
 
+    Args:
+        feed (Feed): The feed to categorize.
+        categories (list): A list of categories to assign to the feed.
+
+    Returns:
+        Feed: The categorized feed.
+    """
+    categories_list = categories.values_list("name", flat=True)
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that generates keywords.",
+        },
+        {
+            "role": "user",
+            "content": f"""extract the most suitable tag from the following topic 
+            
+            the title: {feed.title}, 
+            the summary: {feed.summary}
+            
+            the tags should be in following list:
+             {', '.join(categories_list)}
+            return only one tag from tags in the categories you provided
+            
+            tag:
+            
+            """,
+           
+        },
+    ]
+
+    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    selected_category = response.choices[0].message["content"].strip()
+    
+    # Get the tags for the selected category
+    sub_categories = categories.get(name=selected_category).tags
+    
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that generates keywords.",
+        },
+        {
+            "role": "user",
+            "content": f"""extract news tags from the following news without any signs or numbers and put a comma between , each tag
+            
+            the title: {feed.title}, 
+            the summary: {feed.summary}
+            
+            the tags should be in following list:
+             {', '.join(sub_categories.values_list("name", flat=True))}
+            
+            tags:
+            
+            """,
+           
+        },
+    ]
+
+    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    selected_subcategories = response.choices[0].message["content"].strip().split(",")
+    sub_category = sub_categories.filter(name__in=selected_subcategories)
+    return sub_category
+    
 def generate_tags_for_feed(title: str, summary: str):
     """
     Use the GPT-4o-mini model o.models import Feed, Tagn the OpenAI API to generate a single keyword as a tag for a given news article.
@@ -36,38 +103,21 @@ def generate_tags_for_feed(title: str, summary: str):
         },
         {
             "role": "user",
-            "content": "extract news tags from the following news without any signs or numbers and put a comma between , each tag",
-        },
-        {"role": "user", "content": f"the title: {title}, the summary: {summary}"},
-        {"role": "user", "content": "the tags should be in following categories:"},
-        {"role": "user", "content": "'تصنيف عام', 'أماكن', 'أحداث', 'أشخاص'"},
-        {
-            "role": "user",
-            "content": "(اقتصاد, فن, سياسة, أخبار, رياضة, تكنولوجيا, صحة) التصنيف العام يندرج تحته تلك العلامات",
-        },
-        {
-            "role": "user",
-            "content": "إليك مثال: عنوان الخبر: الجيش الإسرائيلي ينذر سكان 5 بلدات في جنوب لبنان بإخلائها",
-        },
-        {
-            "role": "user",
-            "content": "إليك مثال: ملخص الخبر: أنذر الجيش الإسرائيلي سكان 5 بلدات في جنوب لبنان بإخلائها الفوري تمهيدا لقصفها, زاعما أن نشاطات 'حزب الله' تجبره على العمل بقوة ضده في المناطق التي يتم إنذارها.",
-        },
-        {
-            "role": "user",
-            "content": "التصنيفات ستكون: الاماكن: جنوب لبنان, التصنيف العام: أخبار, الاحداث: قصف, الاشخاص : الجيش الاسرائيلي, حزب الله",
-        },
-        {
-            "role": "user",
-            "content": "return as a python dict with the keys: 'تصنيف عام', 'أماكن', 'أحداث', 'أشخاص' and the values as lists and dont write format of code",
-        },
-        {
-            "role": "user",
-            "content": "لا تضع الدول والمدن مثل الولايات المتحده و واشنطن وغيرها ضمن الاشخاص",
-        },
-        {
-            "role": "user",
-            "content": '{"تصنيف عام": ["أخبار"], "أماكن": ["جنوب لبنان"], "أحداث": ["قصف"], "أشخاص": ["الجيش الاسرائيلي", "حزب الله"]}',
+            "content": f"""extract news tags from the following news without any signs or numbers and put a comma between , each tag
+            
+            the title: {title}, 
+            the summary: {summary}
+            
+            the tags should be in following categories:
+             'تصنيف عام', 'أماكن', 'أحداث', 'أشخاص'
+            (اقتصاد, فن, سياسة, أخبار, رياضة, تكنولوجيا, صحة) التصنيف العام يندرج تحته تلك العلامات
+            إليك مثال: عنوان الخبر: الجيش الإسرائيلي ينذر سكان 5 بلدات في جنوب لبنان بإخلائها
+            إليك مثال: ملخص الخبر: أنذر الجيش الإسرائيلي سكان 5 بلدات في جنوب لبنان بإخلائها الفوري تمهيدا لقصفها, زاعما أن نشاطات 'حزب الله' تجبره على العمل بقوة ضده في المناطق التي يتم إنذارها.
+            التصنيفات ستكون: الاماكن: جنوب لبنان, التصنيف العام: أخبار, الاحداث: قصف, الاشخاص : الجيش الاسرائيلي, حزب الله
+            return as a python dict with the keys: 'تصنيف عام', 'أماكن', 'أحداث', 'أشخاص' and the values as lists and dont write format of code
+            لا تضع الدول والمدن مثل الولايات المتحده و واشنطن وغيرها ضمن الاشخاص
+            {"تصنيف عام": ["أخبار"], "أماكن": ["جنوب لبنان"], "أحداث": ["قصف"], "أشخاص": ["الجيش الاسرائيلي", "حزب الله"]}""",
+           
         },
     ]
 
@@ -76,7 +126,7 @@ def generate_tags_for_feed(title: str, summary: str):
     return keywords
 
 
-def generate_summary(titles, descriptions, urls):
+def generate_summary(feeds):
     """
     Generate a response to a given question based on a list of feeds titles and descriptions.
 
@@ -93,12 +143,12 @@ def generate_summary(titles, descriptions, urls):
     """
 
     context_str = ""
-    for i, feed in enumerate(list(zip(titles, descriptions, urls))):
+    for i, feed in enumerate(feeds):
         context_str += f"""
             <source_id> {i+1} </source_id>
-            <title> {feed[0]} </title>
-            <description> {feed[1]} </description>
-            <url> {feed[2]} </url>
+            <title> {feed.title} </title>
+            <description> {feed.descriptions} </description>
+            <url> {feed.url} </url>
             
          """
 
@@ -155,16 +205,14 @@ def generate_summary(titles, descriptions, urls):
     if len(numbers) == 0:
         answer["summary"] = cleaned_response
         return answer
-    cleaned_response += """
-
-    references:
-
-     """
+    
+    dict_references = {}
     for i, n in enumerate(numbers):
         cleaned_response.replace(f"[{n}]", f"[{i+1}]")
-        cleaned_response += f"[{i+1}] {urls[n-1]} \n"
+        dict_references[f"{i+1}"] = feeds[n-1].url
 
     answer["summary"] = cleaned_response
+    answer["references"] = dict_references
 
     return answer
 
@@ -211,6 +259,7 @@ def get_news_from_rss_v2(rss_url: str, limit: int, source_id: int, user_id: int 
     """
     feed = feedparser.parse(rss_url)
     entries = feed.entries[:limit]
+    categories = Category.objects.all().prefetch_related("tags")
     # Fetch existing feeds
     existing_feeds = get_existing_feeds(entries, user_id)
 
@@ -230,11 +279,15 @@ def get_news_from_rss_v2(rss_url: str, limit: int, source_id: int, user_id: int 
                 user_id=user_id,
                 source_id=source_id,
             )
+            # Collect tags for this feed
+            entry_tags = categorize_feed(new_feed,categories)
+            new_feed.tags.set(entry_tags)
             new_feeds.append(new_feed)
+            
 
     # Bulk create feeds and feed-tag relationships
     if new_feeds:
-        Feed.objects.bulk_create(new_feeds)
+        Feed.objects.bulk_create(new_feeds, ignore_conflicts=True)
     return entries
 
 def get_news_from_sources(user_id):

@@ -62,14 +62,15 @@ def get_embeddings(text):
         list: A list of floats representing the embeddings for the given text.
     """
     model= settings.OPENAI_EMBEDDING_MODEL
-    base_url = settings.OPENAI_API_BASE_URL
+    base_url = settings.OPENAI_BASE_URL
     api_key = settings.OPENAI_API_KEY
     openai.api_key = api_key
     openai.api_base = base_url
-    response = openai.Embed.create(model=model, objects=[{"text": text}])
+    
+    response = openai.Embedding.create(model=model, input = [text])
     if "error" in response:
         raise Exception(response["error"]["message"])
-    embeddings = response["embedding"]
+    embeddings = response['data'][0]["embedding"]
     return embeddings
 
 

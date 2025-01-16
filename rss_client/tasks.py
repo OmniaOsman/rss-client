@@ -57,19 +57,15 @@ def summarize_feeds_by_day():
 
         if not feeds:
             get_news_from_sources(user.id)
-
-        titles = [feed.title for feed in feeds]
-        descriptions = [feed.description for feed in feeds]
-        urls = [feed.url for feed in feeds]
-
         # Generate the summary
-        result = generate_summary(titles, descriptions, urls)
+        result = generate_summary(feeds)
         print("result", result)
 
         # Create a ProcessedFeed object for the subscriber's user
         ProcessedFeed.objects.create(
             title=result["title"],
             summary=result["summary"],
+            references=result["references"],
             created_at=datetime.now(),
             user=user,
         )
@@ -77,37 +73,6 @@ def summarize_feeds_by_day():
         # make feeds inactive
         feeds_queryset.update(active=False)
 
-
-@shared_task(name="summarize_feeds")
-def summarize_feeds(titles, descriptions, urls):
-    """
-    Summarize a list of feeds.
-
-    This task generates a summary for the given titles, descriptions, and urls of a list of feeds.
-    It then creates a ProcessedFeed object with the summary and today's date.
-
-    Args:
-        titles (list): A list of titles for the feeds.
-        descriptions (list): A list of descriptions for the feeds.
-        urls (list): A list of urls for the feeds.
-
-    Returns:
-        tuple: A tuple containing the title and summary of the ProcessedFeed object.
-    """
-    from rss_client.logic import generate_summary
-
-    result = generate_summary(titles, descriptions, urls)
-
-    # Convert the string back to a tuple
-    result_tuple = ast.literal_eval(result)
-
-    ProcessedFeed.objects.create(
-        title=result_tuple[0],
-        summary=result_tuple[1],
-        created_at=datetime.now(),
-    )
-
-    return result_tuple[0], result_tuple[1]
 
 @shared_task
 def report_summaries():
@@ -120,7 +85,7 @@ def report_summaries():
             try:
                 # Use prefetched summaries
                 user_summaries = user.processed_feeds.filter(created_at__date=today)
-                user_publishers = user.publishers
+                user_publishers = user.publishers.all()
                 # Skip if no summaries for this user
                 if not user_summaries:
                     print(f"No summaries for user {user.email}")
