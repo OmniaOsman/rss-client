@@ -51,7 +51,7 @@ def categorize_feed(feed,categories = []):
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    response = openai.ChatCompletion.create(model=settings.OPENAI_CHAT_SMALL_MODEL, messages=messages)
     selected_category = response.choices[0].message["content"].strip()
     
     # Get the tags for the selected category
@@ -79,7 +79,7 @@ def categorize_feed(feed,categories = []):
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    response = openai.ChatCompletion.create(model=settings.OPENAI_CHAT_SMALL_MODEL, messages=messages)
     selected_subcategories = response.choices[0].message["content"].strip().split(",")
     sub_category = sub_categories.filter(name__in=selected_subcategories)
     return sub_category
@@ -120,7 +120,7 @@ def generate_tags_for_feed(title: str, summary: str):
         },
     ]
 
-    response = openai.ChatCompletion.create(model="gpt-4o-mini", messages=messages)
+    response = openai.ChatCompletion.create(model=settings.OPENAI_CHAT_SMALL_MODEL, messages=messages)
     keywords = response.choices[0].message["content"].strip()
     return keywords
 
@@ -189,8 +189,8 @@ def generate_summary(feeds):
             "content": "result must be json with key 'title' and value 'summary', and put comma and dont write format of code",
         },
     ]
-
-    response = openai.ChatCompletion.create(model="gpt-4o", messages=messages)
+    
+    response = openai.ChatCompletion.create(model=settings.OPENAI_CHAT_LARGE_MODEL, messages=messages)
     answer = response.choices[0].message["content"].strip()
 
     # Convert answer to a dictionary using json
@@ -277,9 +277,11 @@ def get_news_from_rss_v2(rss_url: str, limit: int, source_id: int, user_id: int 
                 active=True,
                 user_id=user_id,
                 source_id=source_id,
+
             )
             # Collect tags for this feed
             entry_tags = categorize_feed(new_feed,categories)
+            new_feed.category_id = entry_tags.first().category_id
             new_feed.tags.set(entry_tags)
             new_feeds.append(new_feed)
             

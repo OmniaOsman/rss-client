@@ -157,7 +157,8 @@ AUTH_USER_MODEL = 'accounts.User'
 OPENAI_API_KEY = env('OPENAI_API_KEY')
 OPENAI_BASE_URL = env('OPENAI_BASE_URL', default='https://api.openai.com/v1/')
 OPENAI_EMBEDDING_MODEL = env('OPENAI_EMBEDDING_MODEL', default='text-embedding-3-small')
-OPENAI_CHAT_MODEL = env('OPENAI_CHAT_MODEL', default='gpt-4o')
+OPENAI_CHAT_LARGE_MODEL = env('OPENAI_CHAT_LARGE_MODEL', default='gpt-4o')
+OPENAI_CHAT_SMALL_MODEL = env('OPENAI_CHAT_SMALL_MODEL', default='gpt-4o-mini')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

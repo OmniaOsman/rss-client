@@ -96,6 +96,13 @@ class Feed(models.Model):
         help_text="source associated with the feed",
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    category = models.ForeignKey(
+        TagCategory,
+        on_delete=models.SET_NULL,
+        related_name="feeds",
+        null=True,
+        help_text="feed category",
+    )
     #feed embedding
     embedding = VectorField(dimensions=1536)
 
